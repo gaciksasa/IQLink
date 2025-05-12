@@ -1,0 +1,110 @@
+﻿@model DeviceDataCollector.Models.Device
+
+@{
+    ViewData["Title"] = "Edit Device";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Edit Device</h5>
+                </div>
+                <div class="card-body">
+                    @if (TempData["CommandResponse"] != null)
+                    {
+                        <div class="alert alert-info mb-3">
+                            <h6>Server Response:</h6>
+                            <pre class="mb-0"><code>@TempData["CommandResponse"]</code></pre>
+                        </div>
+                    }
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mb-3">
+                            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mb-3">
+                            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+                        </div>
+                    }
+
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-3">
+                            <label asp-for="SerialNumber" class="form-label">Current Serial Number</label>
+                            <input asp-for="SerialNumber" class="form-control" readonly />
+                            <span asp-validation-for="SerialNumber" class="text-danger"></span>
+                            <div class="form-text">Current serial number cannot be changed directly</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="NewSerialNumber" class="form-label">New Serial Number (Optional)</label>
+                            <input name="NewSerialNumber" id="NewSerialNumber" class="form-control" />
+                            <div class="form-text">Leave blank to keep the current serial number. Only provide a value to update the device via the TCP server.</div>
+                            <span class="text-danger">@Html.ValidationMessage("NewSerialNumber")</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Friendly Name</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <div class="form-text">A descriptive name for this device</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Location" class="form-label">Location</label>
+                            <input asp-for="Location" class="form-control" />
+                            <span asp-validation-for="Location" class="text-danger"></span>
+                            <div class="form-text">Where this device is located</div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label">Device is active</label>
+                            <span asp-validation-for="IsActive" class="text-danger"></span>
+                            <div class="form-text">Inactive devices will still receive data but will be marked as inactive in the UI</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">Notes</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                            <div class="form-text">Additional notes about this device</div>
+                        </div>
+
+                        <div class="alert alert-info mb-3">
+                            <p><strong>Serial Number Update Process:</strong></p>
+                            <p>Clicking "Save Changes" with a new serial number will:</p>
+                            <ol>
+                                <li>Queue a serial number change command in the system</li>
+                                <li>Next time the device communicates with the server, the command will be sent</li>
+                                <li>The device will respond with confirmation or rejection</li>
+                                <li>Database will be updated only after device confirms the change</li>
+                            </ol>
+                            <p><strong>Note:</strong> This process may take some time depending on when the device next communicates with the server.</p>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-warning">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

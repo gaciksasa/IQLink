@@ -1,0 +1,280 @@
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7BDCB5D7-CDE9-7112-F88B-CFA6A04EF322}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>ClassLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>IQLink</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include="Dump20250324.sql" />
+    <Content Include="Properties\PublishProfiles\FolderProfile.pubxml.user" />
+    <Content Include="Views\Shared\_Layout.cshtml.css" />
+    <Content Include="wwwroot\css\site.css" />
+    <Content Include="wwwroot\css\theme.css" />
+    <Content Include="wwwroot\favicon.ico" />
+    <Content Include="wwwroot\js\site.js" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js" />
+    <Content Include="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js" />
+    <Content Include="wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js" />
+    <Content Include="wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js" />
+    <Content Include="wwwroot\lib\bootstrap\dist\js\bootstrap.js" />
+    <Content Include="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js" />
+    <Content Include="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js" />
+    <Content Include="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js" />
+    <Content Include="wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt" />
+    <Content Include="wwwroot\lib\jquery-validation\dist\additional-methods.js" />
+    <Content Include="wwwroot\lib\jquery-validation\dist\additional-methods.min.js" />
+    <Content Include="wwwroot\lib\jquery-validation\dist\jquery.validate.js" />
+    <Content Include="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js" />
+    <Content Include="wwwroot\lib\jquery\dist\jquery.js" />
+    <Content Include="wwwroot\lib\jquery\dist\jquery.min.js" />
+    <Content Include="wwwroot\lib\jquery\LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".git\config" />
+    <None Include=".git\description" />
+    <None Include=".git\HEAD" />
+    <None Include=".git\hooks\applypatch-msg.sample" />
+    <None Include=".git\hooks\commit-msg.sample" />
+    <None Include=".git\hooks\fsmonitor-watchman.sample" />
+    <None Include=".git\hooks\post-update.sample" />
+    <None Include=".git\hooks\pre-applypatch.sample" />
+    <None Include=".git\hooks\pre-commit.sample" />
+    <None Include=".git\hooks\pre-merge-commit.sample" />
+    <None Include=".git\hooks\pre-push.sample" />
+    <None Include=".git\hooks\pre-rebase.sample" />
+    <None Include=".git\hooks\pre-receive.sample" />
+    <None Include=".git\hooks\prepare-commit-msg.sample" />
+    <None Include=".git\hooks\push-to-checkout.sample" />
+    <None Include=".git\hooks\sendemail-validate.sample" />
+    <None Include=".git\hooks\update.sample" />
+    <None Include=".git\info\exclude" />
+    <None Include=".vs\DeviceDataCollector\FileContentIndex\09e71991-b6b0-4d60-a5fb-e40d3cb29e24.vsidx" />
+    <None Include=".vs\DeviceDataCollector\v17\.futdcache.v2" />
+    <None Include=".vs\DeviceDataCollector\v17\.suo" />
+    <None Include=".vs\DeviceDataCollector\v17\DocumentLayout.json" />
+    <None Include=".vs\IQLink\config\applicationhost.config" />
+    <None Include=".vs\IQLink\FileContentIndex\4152a818-50ad-4c9b-89f2-19e4578f2c50.vsidx" />
+    <None Include=".vs\IQLink\FileContentIndex\575cf2f4-f8f6-4030-a58a-bdce907dafb0.vsidx" />
+    <None Include=".vs\IQLink\FileContentIndex\79cb8873-ac2a-4b99-9a1d-ce70a9f17f56.vsidx" />
+    <None Include=".vs\IQLink\FileContentIndex\a0a5393a-3ccb-4074-9ff2-ca755eafd7e1.vsidx" />
+    <None Include=".vs\IQLink\FileContentIndex\cefaf0b8-a51b-44d0-beb0-6e197c100a28.vsidx" />
+    <None Include=".vs\IQLink\v17\.wsuo" />
+    <None Include=".vs\IQLink\v17\DocumentLayout.backup.json" />
+    <None Include=".vs\IQLink\v17\DocumentLayout.json" />
+    <None Include=".vs\ProjectEvaluation\devicedatacollector.metadata.v9.bin" />
+    <None Include=".vs\ProjectEvaluation\devicedatacollector.projects.v9.bin" />
+    <None Include=".vs\ProjectEvaluation\devicedatacollector.strings.v9.bin" />
+    <None Include=".vs\slnx.sqlite" />
+    <None Include=".vs\VSWorkspaceState.json" />
+    <None Include="appsettings.Development.json" />
+    <None Include="appsettings.json" />
+    <None Include="Areas\LipoDoc\Views\DeviceData\Delete.cshtml" />
+    <None Include="Areas\LipoDoc\Views\DeviceData\Details.cshtml" />
+    <None Include="Areas\LipoDoc\Views\DeviceData\Edit.cshtml" />
+    <None Include="Areas\LipoDoc\Views\DeviceData\Index.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Devices\Delete.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Devices\Details.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Devices\Donations.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Devices\Edit.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Devices\EditSetup.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Devices\Index.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Devices\Setup.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Devices\_DeviceList.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Donations\Delete.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Donations\Details.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Donations\Edit.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Donations\Export.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Donations\ExportSettings.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Donations\Index.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Donations\_DonationList.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Home\Index.cshtml" />
+    <None Include="Areas\LipoDoc\Views\Home\Privacy.cshtml" />
+    <None Include="Areas\LipoDoc\Views\_ViewImports.cshtml" />
+    <None Include="Areas\LipoDoc\Views\_ViewStart.cshtml" />
+    <None Include="backups\backup_metadata.json" />
+    <None Include="backups\devicedata_20250313_091953.sql.gz" />
+    <None Include="backups\devicedata_20250313_122200.sql.gz" />
+    <None Include="backups\devicedata_20250313_122300.sql.gz" />
+    <None Include="Properties\launchSettings.json" />
+    <None Include="readme.md" />
+    <None Include="Views\Account\AccessDenied.cshtml" />
+    <None Include="Views\Account\Login.cshtml" />
+    <None Include="Views\Account\Profile.cshtml" />
+    <None Include="Views\Shared\Error.cshtml" />
+    <None Include="Views\Shared\_Layout.cshtml" />
+    <None Include="Views\Shared\_LayoutHelperFunctions.cshtml" />
+    <None Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
+    <None Include="Views\System\Backup.cshtml" />
+    <None Include="Views\System\Database.cshtml" />
+    <None Include="Views\System\Network.cshtml" />
+    <None Include="Views\Users\Create.cshtml" />
+    <None Include="Views\Users\Delete.cshtml" />
+    <None Include="Views\Users\Details.cshtml" />
+    <None Include="Views\Users\Edit.cshtml" />
+    <None Include="Views\Users\Index.cshtml" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.js.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map" />
+    <None Include="wwwroot\lib\bootstrap\LICENSE" />
+    <None Include="wwwroot\lib\jquery-validation\LICENSE.md" />
+    <None Include="wwwroot\lib\jquery\dist\jquery.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Areas\LipoDoc\Controllers\DevicesController.cs" />
+    <Compile Include="Areas\LipoDoc\Controllers\DonationsController.cs" />
+    <Compile Include="Areas\LipoDoc\Controllers\HomeController.cs" />
+    <Compile Include="Areas\LipoDoc\Controllers\LipoDocBaseController.cs" />
+    <Compile Include="Areas\LipoDoc\Models\CurrentDeviceStatus.cs" />
+    <Compile Include="Areas\LipoDoc\Models\Device.cs" />
+    <Compile Include="Areas\LipoDoc\Models\DeviceSetup.cs" />
+    <Compile Include="Areas\LipoDoc\Models\DeviceStatus.cs" />
+    <Compile Include="Areas\LipoDoc\Models\DonationsData.cs" />
+    <Compile Include="Areas\LipoDoc\Models\ExportSettingsConfig.cs" />
+    <Compile Include="Areas\LipoDoc\Models\ExportViewModel.cs" />
+    <Compile Include="Areas\LipoDoc\Services\AutoExportService.cs" />
+    <Compile Include="Areas\LipoDoc\Services\BufferDataRetrievalService.cs" />
+    <Compile Include="Areas\LipoDoc\Services\DeviceCommunicationService.cs" />
+    <Compile Include="Areas\LipoDoc\Services\DeviceDataRetrievalService.cs" />
+    <Compile Include="Areas\LipoDoc\Services\DeviceMessageParser.cs" />
+    <Compile Include="Areas\LipoDoc\Services\DeviceStatusCleanupService.cs" />
+    <Compile Include="Areas\LipoDoc\Services\DeviceStatusMonitorService.cs" />
+    <Compile Include="Areas\LipoDoc\Services\DonationExportHelper.cs" />
+    <Compile Include="Areas\LipoDoc\Services\TCPServerService.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\SystemController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Data\ApplicationDbContext.cs" />
+    <Compile Include="Data\BaseDeviceDbContext.cs" />
+    <Compile Include="Data\CoreDbContext.cs" />
+    <Compile Include="Data\LipoDocDbContext.cs" />
+    <Compile Include="Helpers\DateTimeExtensions.cs" />
+    <Compile Include="Middleware\AuthenticationRedirectMiddleware.cs" />
+    <Compile Include="Migrations\20250225074347_InitialCreate.cs" />
+    <Compile Include="Migrations\20250225074347_InitialCreate.Designer.cs">
+      <DependentUpon>20250225074347_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20250227071335_AddUserTable.cs" />
+    <Compile Include="Migrations\20250227071335_AddUserTable.Designer.cs">
+      <DependentUpon>20250227071335_AddUserTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20250324083708_AddSystemNotificationsTable.cs" />
+    <Compile Include="Migrations\20250324083708_AddSystemNotificationsTable.Designer.cs">
+      <DependentUpon>20250324083708_AddSystemNotificationsTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20250408102741_AddDeviceSetupTable.cs" />
+    <Compile Include="Migrations\20250408102741_AddDeviceSetupTable.Designer.cs">
+      <DependentUpon>20250408102741_AddDeviceSetupTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20250428075019_AddExportedFieldToDonationsOnly.cs" />
+    <Compile Include="Migrations\20250428075019_AddExportedFieldToDonationsOnly.Designer.cs">
+      <DependentUpon>20250428075019_AddExportedFieldToDonationsOnly.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\AddCurrentDeviceStatusTable.cs" />
+    <Compile Include="Migrations\ApplicationDbContextModelSnapshot.cs" />
+    <Compile Include="Migrations\InitialMigration.cs" />
+    <Compile Include="Models\BackupViewModel.cs" />
+    <Compile Include="Models\DatabaseConnectionViewModel.cs" />
+    <Compile Include="Models\ErrorViewModel.cs" />
+    <Compile Include="Models\LoginViewModel.cs" />
+    <Compile Include="Models\ProfileViewModel.cs" />
+    <Compile Include="Models\SystemNotification.cs" />
+    <Compile Include="Models\User.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Services\ApplicationLifetimeService.cs" />
+    <Compile Include="Services\AuthService.cs" />
+    <Compile Include="Services\DatabaseBackupService.cs" />
+    <Compile Include="Services\DatabaseConfigService.cs" />
+    <Compile Include="Services\DatabaseInitializer.cs" />
+    <Compile Include="Services\DatabaseStatusService.cs" />
+    <Compile Include="Services\DbContextFactory.cs" />
+    <Compile Include="Services\DeviceDataRetrievalService.cs" />
+    <Compile Include="Services\NetworkUtilityService.cs" />
+    <Compile Include="Services\ScheduledBackupService.cs" />
+    <Compile Include="Services\ViewContextAccessor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".git\objects\info\" />
+    <Folder Include=".git\objects\pack\" />
+    <Folder Include=".git\refs\heads\" />
+    <Folder Include=".git\refs\tags\" />
+    <Folder Include="Areas\LipoDoc\Data\" />
+    <Folder Include="Migrations\Core\" />
+    <Folder Include="Migrations\LipoDoc\" />
+    <Folder Include="Views\Home\" />
+    <Folder Include="Views\Hub\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>

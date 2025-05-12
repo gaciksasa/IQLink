@@ -1,0 +1,152 @@
+﻿@model IEnumerable<DeviceDataCollector.Models.Device>
+@using DeviceDataCollector.Helpers
+
+@{
+    ViewData["Title"] = "Devices";
+}
+
+<div class="container">
+    <h1 class="mb-4">Devices</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <div id="refreshStatus" class="text-muted small">
+                <i class="bi bi-arrow-clockwise"></i> Auto-refreshing every 10 seconds | Last update: <span id="lastRefreshTime">@DateTime.Now.ToDisplayFormat("HH:mm:ss")</span>
+            </div>
+        </div>
+        <div>
+            <button id="manualRefresh" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-arrow-clockwise"></i> Refresh Now
+            </button>
+            <div class="form-check form-switch d-inline-block ms-2">
+                <input class="form-check-input" type="checkbox" id="autoRefreshToggle" checked>
+                <label class="form-check-label" for="autoRefreshToggle">Auto-refresh</label>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (ViewBag.HasSerialUpdateNotifications)
+    {
+        foreach (var notification in ViewBag.SerialUpdateNotifications)
+        {
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle"></i> @notification.Message
+            </div>
+        }
+    }
+    else if (TempData["SerialChangeQueued"] != null)
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-clock"></i> Serial number change command queued for @TempData["QueuedSerial"].
+            The change will be applied when the device next communicates with the server.
+        </div>
+    }
+
+    <div id="deviceListContainer">
+        @await Html.PartialAsync("_DeviceList", Model)
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-refresh functionality
+        $(document).ready(function () {
+            // Variables for auto-refresh
+            const refreshInterval = 10 * 1000; // 10 seconds
+            let autoRefreshTimer;
+            let secondsCounter;
+            let secondsLeft = refreshInterval / 1000;
+
+            // Function to update devices list
+            function refreshDevicesList() {
+                $.ajax({
+                    url: '@Url.Action("Index", "Devices")',
+                    type: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'  // Mark as AJAX request
+                    },
+                    success: function (result) {
+                        // Replace the entire device list container content
+                        $('#deviceListContainer').html(result);
+                        updateLastRefreshTime();
+                    },
+                    error: function (error) {
+                        console.error("Error refreshing device list:", error);
+                    }
+                });
+            }
+
+            // Function to update last refresh time
+            function updateLastRefreshTime() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                $('#lastRefreshTime').text(`${hours}:${minutes}:${seconds}`);
+
+                // Reset countdown
+                secondsLeft = refreshInterval / 1000;
+                updateRefreshStatus();
+            }
+
+            // Function to update refresh status text with countdown
+            function updateRefreshStatus() {
+                $('#refreshStatus').html(`<i class="bi bi-arrow-clockwise"></i> Auto-refreshing in ${secondsLeft} seconds | Last update: <span id="lastRefreshTime">${$('#lastRefreshTime').text()}</span>`);
+            }
+
+            // Start auto-refresh timer
+            function startAutoRefresh() {
+                // Clear any existing timers
+                stopAutoRefresh();
+
+                // Start new timer
+                autoRefreshTimer = setInterval(refreshDevicesList, refreshInterval);
+
+                // Start the countdown update
+                secondsLeft = refreshInterval / 1000;
+                secondsCounter = setInterval(function() {
+                    secondsLeft--;
+                    updateRefreshStatus();
+                }, 1000);
+
+                $('#autoRefreshToggle').prop('checked', true);
+            }
+
+            // Stop auto-refresh timer
+            function stopAutoRefresh() {
+                clearInterval(autoRefreshTimer);
+                clearInterval(secondsCounter);
+                $('#refreshStatus').html(`<i class="bi bi-clock-history"></i> Auto-refresh paused | Last update: <span id="lastRefreshTime">${$('#lastRefreshTime').text()}</span>`);
+                $('#autoRefreshToggle').prop('checked', false);
+            }
+
+            // Initialize auto-refresh
+            startAutoRefresh();
+
+            // Handle manual refresh button
+            $('#manualRefresh').click(function () {
+                refreshDevicesList();
+                // If auto-refresh is on, restart the timer
+                if ($('#autoRefreshToggle').is(':checked')) {
+                    startAutoRefresh();
+                }
+            });
+
+            // Handle auto-refresh toggle
+            $('#autoRefreshToggle').change(function () {
+                if ($(this).is(':checked')) {
+                    startAutoRefresh();
+                } else {
+                    stopAutoRefresh();
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,893 @@
+﻿@model DeviceDataCollector.Models.ExportViewModel
+
+@{
+    ViewData["Title"] = "Export Donations";
+}
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Donations" asp-action="Index">Donations</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Export</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <h1 class="mb-4">Export Donations</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Saved Configurations Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Saved Export Configurations</h5>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#manageConfigsModal">
+                            <i class="bi bi-gear"></i> Manage Configurations
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (!Model.SavedConfigurations.Any() || Model.SavedConfigurations.Count <= 1)
+                    {
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle me-2"></i> No saved export configurations found. Configure the settings below and click "Save Configuration".
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group mb-3">
+                            <label for="configSelect" class="form-label">Select a saved configuration:</label>
+                            <select id="configSelect" class="form-select">
+                                @foreach (var config in Model.SavedConfigurations)
+                                {
+                                    <option value="@config.Value" selected="@config.Selected">@config.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button id="loadConfigButton" class="btn btn-primary btn-sm">
+                                <i class="bi bi-box-arrow-in-right"></i> Load Selected Configuration
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Export Settings Form -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Export Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="ExportData" method="post" id="exportForm">
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="mb-3">Select columns to export:</h6>
+                                <div class="row" id="columnSelection">
+                                    @foreach (var column in Model.AvailableColumns)
+                                    {
+                                        <div class="col-md-4 mb-2">
+                                            <div class="form-check">
+                                                @if (column.Selected)
+                                                {
+                                                    <input class="form-check-input column-checkbox" type="checkbox"
+                                                    value="@column.Id" id="column_@column.Id"
+                                                    name="SelectedColumns" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input class="form-check-input column-checkbox" type="checkbox"
+                                                    value="@column.Id" id="column_@column.Id"
+                                                    name="SelectedColumns">
+                                                }
+                                                <label class="form-check-label" for="column_@column.Id">
+                                                    @column.Name
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="selectAllColumns">Select All</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAllColumns">Deselect All</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Column Ordering and Empty Columns Section -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Drag and drop columns to reorder them in the export file.
+                                    </div>
+
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <span>Column Order</span>
+                                            <div class="input-group input-group-sm" style="max-width: 300px;">
+                                                <input type="text" class="form-control" id="emptyColumnName"
+                                                placeholder="Empty Column Name (optional)">
+                                                <button class="btn btn-outline-primary" type="button" id="addEmptyColumnBtn">
+                                                    <i class="bi bi-plus-circle"></i> Add Empty Column
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <ul class="list-group" id="sortableColumns">
+                                                @{
+                                                    var columnsToDisplay = new List<ColumnSelectionItem>();
+
+                                                    // If we have column order, use that
+                                                    if (Model.ColumnOrder.Any())
+                                                    {
+                                                        foreach (var columnId in Model.ColumnOrder)
+                                                        {
+                                                            if (columnId.StartsWith("empty_"))
+                                                            {
+                                                                int emptyIndex = int.Parse(columnId.Substring(6));
+                                                                columnsToDisplay.Add(new ColumnSelectionItem
+                                                                {
+                                                                    Id = columnId,
+                                                                    Name = $"Empty Column {emptyIndex + 1}"
+                                                                });
+                                                            }
+                                                            else
+                                                            {
+                                                                var column = Model.AvailableColumns.FirstOrDefault(c => c.Id == columnId);
+                                                                if (column != null)
+                                                                {
+                                                                    columnsToDisplay.Add(column);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        // Otherwise, show selected columns
+                                                        columnsToDisplay = Model.AvailableColumns.Where(c => c.Selected).ToList();
+
+                                                        // Add empty columns at the end
+                                                        for (int i = 0; i < Model.EmptyColumnsCount; i++)
+                                                        {
+                                                            columnsToDisplay.Add(new ColumnSelectionItem
+                                                            {
+                                                                Id = $"empty_{i}",
+                                                                Name = $"Empty Column {i + 1}"
+                                                            });
+                                                        }
+                                                    }
+                                                }
+
+                                                @foreach (var column in columnsToDisplay)
+                                                {
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                                                    data-column-id="@column.Id">
+                                                        <span><i class="bi bi-grip-vertical me-2"></i>@column.Name</span>
+                                                        <input type="hidden" name="ColumnOrder" value="@column.Id" />
+                                                        <button type="button" class="btn btn-sm btn-outline-danger remove-column-btn">
+                                                            <i class="bi bi-x"></i>
+                                                        </button>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Hidden input to keep track of empty columns count -->
+                                <input type="hidden" id="EmptyColumnsCount" name="EmptyColumnsCount" value="@Model.EmptyColumnsCount">
+                                <input type="hidden" id="SelectedConfigId" name="SelectedConfigId" value="@Model.SelectedConfigId">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="row mb-4">
+                            <h6 class="mb-3">Filter options:</h6>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="StartDate" class="form-label">Start Date</label>
+                                <input asp-for="StartDate" class="form-control" type="date">
+                                <span asp-validation-for="StartDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="EndDate" class="form-label">End Date</label>
+                                <input asp-for="EndDate" class="form-control" type="date">
+                                <span asp-validation-for="EndDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="DeviceId" class="form-label">Device</label>
+                                <select asp-for="DeviceId" asp-items="Model.AvailableDevices" class="form-select">
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="row">
+                            <h6 class="mb-3">Format options:</h6>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="IncludeHeaders" class="form-label">Headers</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="IncludeHeaders" class="form-check-input" type="checkbox" role="switch" id="includeHeadersSwitch">
+                                    <label class="form-check-label" for="includeHeadersSwitch">Include column headers</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Delimiter" class="form-label">Column Delimiter</label>
+                                <select asp-for="Delimiter" asp-items="Model.DelimiterOptions" class="form-select">
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3" id="customSeparatorContainer" style="display: none;">
+                                <label asp-for="CustomSeparator" class="form-label">Custom Separator</label>
+                                <input asp-for="CustomSeparator" class="form-control" placeholder="Enter custom separator" maxlength="5">
+                                <span asp-validation-for="CustomSeparator" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="DateFormat" class="form-label">Date Format</label>
+                                <select asp-for="DateFormat" asp-items="Model.DateFormatOptions" class="form-select">
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="TimeFormat" class="form-label">Time Format</label>
+                                <select asp-for="TimeFormat" asp-items="Model.TimeFormatOptions" class="form-select">
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="row mb-4">
+                            <h6 class="mb-3">Auto Export Options:</h6>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check form-switch">
+                                    <input asp-for="AutoExportEnabled" class="form-check-input" type="checkbox" id="autoExportEnabledSwitch">
+                                    <label class="form-check-label" for="autoExportEnabledSwitch">Enable Auto Export</label>
+                                </div>
+                                <div class="text-muted small">Automatically export donations when they are received</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="AutoExportMode" class="form-label">Export Mode</label>
+                                <select asp-for="AutoExportMode" class="form-select" id="autoExportMode">
+                                    <option value="single_file">Single File (Append)</option>
+                                    <option value="daily_file">Daily Files</option>
+                                    <option value="individual_files">Individual Files (Per Donation)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CustomFileName" class="form-label">Custom File Name</label>
+                                <input asp-for="CustomFileName" class="form-control" placeholder="Donations_Export">
+                                <div class="text-muted small">
+                                    <span id="filenameFormatInfo">Base name for export files</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-3" id="autoExportStatus" style="display: none;">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <span id="autoExportStatusText">Auto-export is disabled. Enable it to automatically export new donations.</span>
+                        </div>
+
+                        <!-- Save Configuration Section -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0">Save Configuration</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="ConfigName" class="form-label">Configuration Name</label>
+                                        <input asp-for="ConfigName" class="form-control" placeholder="My Export Configuration" 
+                                        value="@Model.ConfigName">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="ConfigDescription" class="form-label">Description (Optional)</label>
+                                        <input asp-for="ConfigDescription" class="form-control" placeholder="Description of this configuration"
+                                        value="@Model.ConfigDescription">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input asp-for="SaveAsNew" class="form-check-input" type="checkbox" id="saveAsNewCheckbox">
+                                            <label class="form-check-label" for="saveAsNewCheckbox">
+                                                Save as new configuration
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input asp-for="SetAsDefault" class="form-check-input" type="checkbox" id="setAsDefaultCheckbox">
+                                            <label class="form-check-label" for="setAsDefaultCheckbox">
+                                                Set as default configuration
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label asp-for="ExportFolderPath" class="form-label">Export Folder</label>
+                                        <div class="input-group">
+                                            <input type="text" asp-for="ExportFolderPath" class="form-control" placeholder="">
+                                            <button class="btn btn-outline-secondary" type="button" id="selectFolderBtn">
+                                                <i class="bi bi-folder2-open"></i> Browse
+                                            </button>
+                                        </div>
+                                        <small class="form-text text-muted">Enter the path where files will be saved.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <div>
+                                <a asp-action="Index" class="btn btn-secondary me-2">Back to Donations</a>
+                                <button type="button" id="saveConfigBtn" class="btn btn-success">
+                                    <i class="bi bi-save"></i> Save Configuration
+                                </button>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-download"></i> Manual Export to CSV
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Export Help</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Configurations</h6>
+                    <p>Save your export settings to reuse them later. You can create multiple configurations for different purposes.</p>
+
+                    <h6>Column Selection</h6>
+                    <p>Select the columns you want to include in your CSV export.</p>
+
+                    <h6>Column Ordering</h6>
+                    <p>Enable column sorting to arrange the order of columns in your export. Drag and drop to reorder.</p>
+
+                    <h6>Empty Columns</h6>
+                    <p>Add blank columns to the export file that you can manually fill in later.</p>
+
+                    <h6>Date & Time Formats</h6>
+                    <p>Select how dates and times should be formatted in the export file:</p>
+                    <ul>
+                        <li><code>yyyy-MM-dd</code>: 2025-04-16</li>
+                        <li><code>dd.MM.yyyy</code>: 16.04.2025</li>
+                        <li><code>MM/dd/yyyy</code>: 04/16/2025</li>
+                        <li><code>HH:mm:ss</code>: 14:30:00 (24-hour)</li>
+                        <li><code>hh:mm:ss tt</code>: 02:30:00 PM (12-hour)</li>
+                    </ul>
+
+                    <h6>Delimiter Options</h6>
+                    <p>The column delimiter determines how values are separated in the CSV file:</p>
+                    <ul>
+                        <li>Comma: Standard for CSV files</li>
+                        <li>Semicolon: Used in regions where comma is a decimal separator</li>
+                        <li>Tab: Better for data with commas in values</li>
+                        <li>Pipe: Alternative separator for complex data</li>
+                        <li>Custom: Use your own delimiter character(s)</li>
+                    </ul>
+
+                    <h6>Header Options</h6>
+                    <p>You can choose whether to include column headers in the exported file:</p>
+                    <ul>
+                        <li><strong>Include headers:</strong> The first row will contain column names</li>
+                        <li><strong>Exclude headers:</strong> The file will contain only data rows</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Manage Configurations Modal -->
+<div class="modal fade" id="manageConfigsModal" tabindex="-1" aria-labelledby="manageConfigsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="manageConfigsModalLabel">Manage Export Configurations</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (!Model.SavedConfigurations.Any() || Model.SavedConfigurations.Count <= 1)
+                {
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i> No saved export configurations found. Configure the settings below and click "Save Configuration".
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 1; i < Model.SavedConfigurations.Count; i++)
+                                {
+                                    var config = Model.SavedConfigurations[i];
+                                    var configValue = config.Value;
+                                    var configText = config.Text;
+                                    var isDefault = configText.Contains("(Default)");
+                                    var displayName = isDefault ? configText.Replace(" (Default)", "") : configText;
+
+                                    <tr>
+                                        <td>@displayName</td>
+                                        <td>-</td>
+                                        <td>
+                                            @if (isDefault)
+                                            {
+                                                <span class="badge bg-primary">Default</span>
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="SetDefaultExportSettings" asp-route-id="@configValue" method="post" style="display: inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-star"></i> Set Default
+                                                    </button>
+                                                </form>
+                                            }
+                                        </td>
+                                        <td>
+                                            <form asp-action="DeleteExportSettings" asp-route-id="@configValue" method="post" 
+                                                    style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this configuration?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="bi bi-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize Sortable.js for column ordering
+            var sortableColumns = document.getElementById('sortableColumns');
+            if (sortableColumns) {
+                new Sortable(sortableColumns, {
+                    animation: 150,
+                    handle: '.bi-grip-vertical',
+                    onSort: function(evt) {
+                        // Update hidden inputs for column order
+                        updateColumnOrderInputs();
+                    }
+                });
+            }
+
+            // Initialize empty column counter
+            let emptyColumnCounter = @Model.EmptyColumnsCount;
+
+            // Function to update hidden inputs for column order
+            function updateColumnOrderInputs() {
+                // Remove existing hidden inputs
+                $('#sortableColumns').find('input[name="ColumnOrder"]').remove();
+
+                // Add new hidden inputs based on current order
+                $('#sortableColumns li').each(function() {
+                    var columnId = $(this).data('column-id');
+                    $(this).append('<input type="hidden" name="ColumnOrder" value="' + columnId + '" />');
+                });
+
+                // Update empty columns count
+                updateEmptyColumnsCount();
+            }
+
+            // Function to update the empty columns count
+            function updateEmptyColumnsCount() {
+                let emptyCount = 0;
+                $('#sortableColumns li').each(function() {
+                    if ($(this).data('column-id').toString().startsWith('empty_')) {
+                        emptyCount++;
+                    }
+                });
+                $('#EmptyColumnsCount').val(emptyCount);
+            }
+
+            // Add Empty Column button handler
+            $('#addEmptyColumnBtn').click(function() {
+                if (emptyColumnCounter >= 20) {
+                    alert('Maximum of 20 empty columns allowed');
+                    return;
+                }
+
+                const customName = $('#emptyColumnName').val().trim();
+                const columnName = customName ? customName : 'Empty Column ' + (emptyColumnCounter + 1);
+                const columnId = 'empty_' + emptyColumnCounter;
+
+                // Create new list item
+                const newItem = $('<li>')
+                    .addClass('list-group-item d-flex justify-content-between align-items-center')
+                    .attr('data-column-id', columnId)
+                    .append('<span><i class="bi bi-grip-vertical me-2"></i>' + columnName + '</span>')
+                    .append('<input type="hidden" name="ColumnOrder" value="' + columnId + '" />')
+                    .append('<button type="button" class="btn btn-sm btn-outline-danger remove-column-btn"><i class="bi bi-x"></i></button>');
+
+                // Add to sortable list
+                $('#sortableColumns').append(newItem);
+
+                // Increment counter and update hidden input
+                emptyColumnCounter++;
+                updateEmptyColumnsCount();
+
+                // Clear input field
+                $('#emptyColumnName').val('');
+            });
+
+            // Remove column button handler (using event delegation for dynamically added buttons)
+            $(document).on('click', '.remove-column-btn', function() {
+                const listItem = $(this).closest('li');
+                const columnId = listItem.data('column-id');
+
+                // If it's a data column, uncheck the corresponding checkbox
+                if (!columnId.toString().startsWith('empty_')) {
+                    $('#column_' + columnId).prop('checked', false);
+                }
+
+                // Remove the list item
+                listItem.remove();
+
+                // Update column order and empty count
+                updateColumnOrderInputs();
+            });
+
+            // Update sortable list when column checkboxes change
+            $('.column-checkbox').change(function() {
+                var columnId = $(this).val();
+                var isChecked = $(this).is(':checked');
+                var columnName = $(this).closest('.form-check').find('label').text().trim();
+
+                if (isChecked) {
+                    // Check if this column already exists in the list
+                    if ($('#sortableColumns li[data-column-id="' + columnId + '"]').length === 0) {
+                        // Add the column to the sortable list
+                        var listItem = $('<li>')
+                            .addClass('list-group-item d-flex justify-content-between align-items-center')
+                            .attr('data-column-id', columnId)
+                            .append('<span><i class="bi bi-grip-vertical me-2"></i>' + columnName + '</span>')
+                            .append('<input type="hidden" name="ColumnOrder" value="' + columnId + '" />')
+                            .append('<button type="button" class="btn btn-sm btn-outline-danger remove-column-btn"><i class="bi bi-x"></i></button>');
+
+                        $('#sortableColumns').append(listItem);
+                    }
+                } else {
+                    // Remove the column from the sortable list
+                    $('#sortableColumns li[data-column-id="' + columnId + '"]').remove();
+                }
+
+                // Update hidden inputs
+                updateColumnOrderInputs();
+            });
+
+            // Function to update the sortable list based on selected columns
+            function updateSortableList() {
+                // Get all currently selected column IDs (including empty columns)
+                const currentEmptyColumns = $('#sortableColumns li').filter(function() {
+                    return $(this).data('column-id').toString().startsWith('empty_');
+                }).clone(true);
+
+                // Clear only the data columns (not empty columns)
+                $('#sortableColumns li').not(function() {
+                    return $(this).data('column-id').toString().startsWith('empty_');
+                }).remove();
+
+                // Add all checked columns to the sortable list
+                $('.column-checkbox:checked').each(function() {
+                    var columnId = $(this).val();
+                    var columnName = $(this).closest('.form-check').find('label').text().trim();
+
+                    // Skip if this column is already in the list
+                    if ($('#sortableColumns li[data-column-id="' + columnId + '"]').length > 0) {
+                        return;
+                    }
+
+                    var listItem = $('<li>')
+                        .addClass('list-group-item d-flex justify-content-between align-items-center')
+                        .attr('data-column-id', columnId)
+                        .append('<span><i class="bi bi-grip-vertical me-2"></i>' + columnName + '</span>')
+                        .append('<input type="hidden" name="ColumnOrder" value="' + columnId + '" />')
+                        .append('<button type="button" class="btn btn-sm btn-outline-danger remove-column-btn"><i class="bi bi-x"></i></button>');
+
+                    $('#sortableColumns').append(listItem);
+                });
+
+                // Update hidden inputs
+                updateColumnOrderInputs();
+            }
+
+            // Handle Select All button
+            $('#selectAllColumns').click(function() {
+                $('.column-checkbox').prop('checked', true);
+                updateSortableList();
+            });
+
+            // Handle Deselect All button
+            $('#deselectAllColumns').click(function() {
+                $('.column-checkbox').prop('checked', false);
+                updateSortableList();
+            });
+
+            // Handle custom delimiter field visibility
+            $('select[name="Delimiter"]').change(function() {
+                if ($(this).val() === 'custom') {
+                    $('#customSeparatorContainer').show();
+                } else {
+                    $('#customSeparatorContainer').hide();
+                }
+            });
+
+            // Check initial delimiter value on page load
+            if ($('select[name="Delimiter"]').val() === 'custom') {
+                $('#customSeparatorContainer').show();
+            }
+
+            // Handle Save Configuration button click
+            $('#saveConfigBtn').click(function(e) {
+                e.preventDefault();
+
+                // Make sure a configuration name is provided
+                if (!$('#ConfigName').val().trim()) {
+                    alert('Please enter a configuration name');
+                    $('#ConfigName').focus();
+                    return;
+                }
+
+                // Create a new form
+                var $form = $('<form>');
+                $form.attr('action', '@Url.Action("SaveExportSettings", "Donations")');
+                $form.attr('method', 'post');
+
+                // Add anti-forgery token
+                var token = $('input[name="__RequestVerificationToken"]').val();
+                $form.append($('<input type="hidden" name="__RequestVerificationToken">').val(token));
+
+                // Copy all input values from the original form
+                $('#exportForm').find('input, select, textarea').each(function() {
+                    var input = $(this);
+                    var name = input.attr('name');
+                    var value = input.val();
+
+                    if (name) {
+                        // Skip anti-forgery token as we've already added it
+                        if (name === '__RequestVerificationToken') {
+                            return;
+                        }
+
+                        // Skip ColumnOrder as we'll handle it separately
+                        if (name === 'ColumnOrder') {
+                            return;
+                        }
+
+                        // For checkboxes, handle special case
+                        if (input.attr('type') === 'checkbox') {
+                            if (input.is(':checked')) {
+                                $form.append($('<input type="hidden">').attr('name', name).val('true'));
+                            } else {
+                                $form.append($('<input type="hidden">').attr('name', name).val('false'));
+                            }
+                        }
+                        // For multi-select elements
+                        else if (input.prop('multiple') && input.prop('selectedOptions')) {
+                            var options = input.prop('selectedOptions');
+                            for (var i = 0; i < options.length; i++) {
+                                $form.append($('<input type="hidden">').attr('name', name).val(options[i].value));
+                            }
+                        }
+                        // For regular inputs
+                        else {
+                            $form.append($('<input type="hidden">').attr('name', name).val(value));
+                        }
+                    }
+                });
+
+                // Get column order directly from list items instead of hidden inputs
+                // This avoids duplicate entries in the ColumnOrderJson
+                $('#sortableColumns li').each(function() {
+                    var columnId = $(this).data('column-id');
+                    $form.append($('<input type="hidden" name="ColumnOrder">').val(columnId));
+                });
+
+                // Special handling for selected columns
+                $('.column-checkbox:checked').each(function() {
+                    var value = $(this).val();
+                    $form.append($('<input type="hidden" name="SelectedColumns">').val(value));
+                });
+
+                // Make sure to add SaveAsNew and SetAsDefault values
+                $form.append($('<input type="hidden" name="SaveAsNew">').val($('#saveAsNewCheckbox').is(':checked')));
+                $form.append($('<input type="hidden" name="SetAsDefault">').val($('#setAsDefaultCheckbox').is(':checked')));
+
+                // Add the form to the DOM
+                $form.css('display', 'none');
+                $form.appendTo('body');
+
+                // Submit the form and then remove it
+                $form.submit();
+                setTimeout(function() {
+                    $form.remove();
+                }, 1000);
+            });
+
+            // Handle the Load Config button
+            $('#loadConfigButton').click(function() {
+                const configId = $('#configSelect').val();
+                if (configId) {
+                    window.location.href = '@Url.Action("Export", "Donations")?configId=' + configId;
+                }
+            });
+
+            // Export folder path
+            $('#selectFolderBtn').click(function() {
+                const path = prompt("Enter the folder path where CSV files will be saved:", $('#ExportFolderPath').val() || "C:\\Exports");
+                if (path) {
+                    $('#ExportFolderPath').val(path);
+                }
+            });
+
+            // Form validation for export
+            $('#exportForm').submit(function(e) {
+                // Check if at least one column or empty column is selected
+                if ($('#sortableColumns li').length === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one column to export or add an empty column');
+                    return false;
+                }
+
+                // Validate date range
+                const startDate = $('#StartDate').val();
+                const endDate = $('#EndDate').val();
+
+                if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                    e.preventDefault();
+                    alert('Start date cannot be later than end date');
+                    return false;
+                }
+
+                // Validate custom separator if it's selected
+                if ($('select[name="Delimiter"]').val() === 'custom') {
+                    const customSeparator = $('#CustomSeparator').val();
+                    if (!customSeparator) {
+                        e.preventDefault();
+                        alert('Please enter a custom separator');
+                        $('#CustomSeparator').focus();
+                        return false;
+                    }
+                }
+
+                // If all validations pass, return true to submit the form
+                return true;
+            });
+
+            // Auto Export Mode related scripts
+            $('#autoExportMode').change(function() {
+                updateFilenameFormatInfo();
+            });
+
+            $('#autoExportEnabledSwitch').change(function() {
+                const isEnabled = $(this).is(':checked');
+                $('#autoExportMode').prop('disabled', !isEnabled);
+                $('#CustomFileName').prop('disabled', !isEnabled);
+            });
+
+            function updateFilenameFormatInfo() {
+                const mode = $('#autoExportMode').val();
+                const customName = $('#CustomFileName').val() || 'Donations_Export';
+
+                let formatInfo = '';
+                switch(mode) {
+                    case 'single_file':
+                        formatInfo = `Results in: ${customName}.csv`;
+                        break;
+                    case 'daily_file':
+                        const today = new Date();
+                        const dateStr = today.toISOString().split('T')[0].replace(/-/g, '_');
+                        formatInfo = `Results in: ${customName}_${dateStr}.csv`;
+                        break;
+                    case 'individual_files':
+                        formatInfo = `Results in: ${customName}_DonationID.csv`;
+                        break;
+                }
+
+                $('#filenameFormatInfo').text(formatInfo);
+            }
+
+            // Initialize the format info and disabled state
+            $(document).ready(function() {
+                updateFilenameFormatInfo();
+
+                const isEnabled = $('#autoExportEnabledSwitch').is(':checked');
+                $('#autoExportMode').prop('disabled', !isEnabled);
+                $('#CustomFileName').prop('disabled', !isEnabled);
+            });
+
+            function updateAutoExportStatus() {
+                const isEnabled = $('#autoExportEnabledSwitch').is(':checked');
+                const mode = $('#autoExportMode').val();
+                const customName = $('#CustomFileName').val() || 'Donations_Export';
+                const exportFolder = $('#ExportFolderPath').val() || 'DonationsExport (in My Documents)';
+
+                if (isEnabled) {
+                    let statusText = `Auto-export is <strong>enabled</strong>. `;
+
+                    switch(mode) {
+                        case 'single_file':
+                            statusText += `New donations will be exported to a single file named <strong>${customName}.csv</strong> in the folder <strong>${exportFolder}</strong>.`;
+                            break;
+                        case 'daily_file':
+                            const today = new Date();
+                            const dateStr = today.toISOString().split('T')[0].replace(/-/g, '_');
+                            statusText += `New donations will be exported to daily files named <strong>${customName}_${dateStr}.csv</strong> in the folder <strong>${exportFolder}</strong>.`;
+                            break;
+                        case 'individual_files':
+                            statusText += `Each new donation will be exported to its own file named <strong>${customName}_DonationID.csv</strong> in the folder <strong>${exportFolder}</strong>.`;
+                            break;
+                    }
+
+                    $('#autoExportStatusText').html(statusText);
+                    $('#autoExportStatus').removeClass('alert-info').addClass('alert-success').show();
+                } else {
+                    $('#autoExportStatusText').text('Auto-export is disabled. Enable it to automatically export new donations.');
+                    $('#autoExportStatus').removeClass('alert-success').addClass('alert-info').show();
+                }
+            }
+
+            // Call this function when the page loads and when settings change
+            $(document).ready(function() {
+                updateAutoExportStatus();
+
+                $('#autoExportEnabledSwitch').change(updateAutoExportStatus);
+                $('#autoExportMode').change(updateAutoExportStatus);
+                $('#CustomFileName').on('input', updateAutoExportStatus);
+                $('#ExportFolderPath').on('input', updateAutoExportStatus);
+            });
+        });
+    </script>
+}

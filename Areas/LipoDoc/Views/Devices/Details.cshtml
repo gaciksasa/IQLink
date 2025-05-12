@@ -1,0 +1,281 @@
+﻿@model DeviceDataCollector.Models.Device
+
+@{
+    ViewData["Title"] = "Device Details";
+    var latestStatus = ViewBag.LatestStatus as DeviceDataCollector.Models.DeviceStatus;
+    var readingsCount = ViewBag.ReadingsCount;
+}
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Devices</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">@Model.SerialNumber</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    @if (TempData["InfoMessage"] != null)
+    {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> @TempData["InfoMessage"]
+            </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Device Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-muted">
+                            <strong>Serial Number</strong>
+                        </div>
+                        <div class="col-md-8">
+                            @Model.SerialNumber
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-muted">
+                            <strong>Name</strong>
+                        </div>
+                        <div class="col-md-8">
+                            @Model.Name
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-muted">
+                            <strong>Location</strong>
+                        </div>
+                        <div class="col-md-8">
+                            @(string.IsNullOrEmpty(Model.Location) ? "-" : Model.Location)
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-muted">
+                            <strong>Status</strong>
+                        </div>
+                        <div class="col-md-8">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-muted">
+                            <strong>Registered</strong>
+                        </div>
+                        <div class="col-md-8">
+                            @Model.RegisteredDate.ToString("dd.MM.yyyy HH:mm:ss")
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 text-muted">
+                            <strong>Last Connection</strong>
+                        </div>
+                        <div class="col-md-8">
+                            @if (Model.LastConnectionTime.HasValue)
+                            {
+                                @Model.LastConnectionTime.Value.ToString("dd.MM.yyyy HH:mm:ss")
+                            }
+                            else
+                            {
+                                <span>Never</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-4 text-muted">
+                                <strong>Notes</strong>
+                            </div>
+                            <div class="col-md-8">
+                                @Model.Notes
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-info">Back to List</a>
+                        <div>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <form asp-action="RequestSetup" method="post" class="d-inline" id="setupRequestForm">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-info" id="setupRequestButton"
+                                            @(ViewBag.IsInSetupMode ? "" : "disabled")>
+                                        <i class="bi bi-arrow-repeat"></i> <span id="setupButtonText">View Device Setup</span>
+                                        <span class="spinner-border spinner-border-sm ms-1 d-none" id="setupSpinner" role="status" aria-hidden="true"></span>
+                                    </button>
+                                </form>
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-info">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            }
+                        </div>
+                    </div>
+                    @if (!ViewBag.IsInSetupMode && ViewBag.LatestStatus != null)
+                    {
+                        <div class="alert alert-warning mt-2 mb-0">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            Device setup is not available! Device should be in setup mode.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Current Status</h5>
+                </div>
+                <div class="card-body">
+                    @if (latestStatus != null)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-4 text-muted">
+                                <strong>Last Update</strong>
+                            </div>
+                            <div class="col-md-8">
+                                @latestStatus.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4 text-muted">
+                                <strong>Device Status</strong>
+                            </div>
+                            <div class="col-md-8">
+                                @switch (latestStatus.Status)
+                                {
+                                    case 0:
+                                        <span class="badge bg-secondary">IDLE</span>
+                                        break;
+                                    case 1:
+                                        <span class="badge bg-primary">Process in Progress</span>
+                                        break;
+                                    case 2:
+                                        <span class="badge bg-success">Process Completed</span>
+                                        break;
+                                    case 3:
+                                        <span class="badge bg-success">Setup Mode</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-warning">Unknown (@latestStatus.Status)</span>
+                                        break;
+                                }
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4 text-muted">
+                                <strong>Available Donations</strong>
+                            </div>
+                            <div class="col-md-8">
+                                @latestStatus.AvailableData records
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4 text-muted">
+                                <strong>IP Address</strong>
+                            </div>
+                            <div class="col-md-8">
+                                @latestStatus.IPAddress:@latestStatus.Port
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            No status information available for this device yet.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Donations Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6 text-muted">
+                            <strong>Total Donations</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>@readingsCount</h4>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a asp-action="Donations" asp-route-id="@Model.Id" class="btn btn-info">
+                            <i class="bi bi-droplet"></i> View Donations
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+        <script>
+            // Set up the setup request form submission
+            $(document).ready(function() {
+                $("#setupRequestForm").on("submit", function(e) {
+                    // Show the spinner and update text
+                    $("#setupButtonText").text("Requesting Setup...");
+                    $("#setupSpinner").removeClass("d-none");
+                    $("#setupRequestButton").attr("disabled", true);
+                });
+
+                // Add tooltip to disabled button to explain why it's disabled
+                if ($("#setupRequestButton").is(":disabled")) {
+                    $("#setupRequestButton").attr("title", "Device must be in setup mode (status 3) to request setup");
+
+                    // Optional: Add Bootstrap tooltip initialization if you want a nicer tooltip
+                    // Make sure Bootstrap JS is included for this to work
+                    $("#setupRequestButton").tooltip();
+
+                    // Handle clicks on disabled button to show a message
+                    $("#setupRequestButton").on("click", function(e) {
+                        if ($(this).is(":disabled")) {
+                            e.preventDefault();
+                            alert("Device must be in setup mode (status 3) to request setup");
+                        }
+                    });
+                }
+            });
+        </script>
+}
