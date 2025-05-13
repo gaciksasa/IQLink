@@ -1,4 +1,4 @@
-﻿namespace DeviceDataCollector.Middleware
+﻿namespace IQLink.Middleware
 {
     public class AuthenticationRedirectMiddleware
     {

@@ -1,7 +1,7 @@
-﻿@model DeviceDataCollector.Models.DeviceSetup
+﻿@model IQLink.Models.DeviceSetup
 
 @{
-    var device = ViewBag.Device as DeviceDataCollector.Models.Device;
+    var device = ViewBag.Device as IQLink.Models.Device;
     ViewData["Title"] = $"Edit Device Setup - {device.Name}";
 }
 
@@ -290,7 +290,7 @@
                                             var config = Model.BarcodeConfigs?.FirstOrDefault(bc => bc.Index == idx);
                                             if (config == null)
                                             {
-                                                config = new DeviceDataCollector.Models.BarcodeConfig
+                                                config = new IQLink.Models.BarcodeConfig
                     {
                         Index = idx,
                         MinLength = 0,
@@ -347,7 +347,7 @@
                                         var profile = Model.Profiles?.FirstOrDefault(p => p.Index == idx);
                                         if (profile == null)
                                         {
-                                            profile = new DeviceDataCollector.Models.DeviceProfile
+                                            profile = new IQLink.Models.DeviceProfile
                     {
                         Index = idx,
                         Name = "",

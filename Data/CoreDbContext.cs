@@ -1,7 +1,7 @@
-using DeviceDataCollector.Models;
+using IQLink.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DeviceDataCollector.Data
+namespace IQLink.Data
 {
     public class CoreDbContext : DbContext
     {

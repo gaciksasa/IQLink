@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DeviceDataCollector.Migrations
+namespace IQLink.Migrations
 {
     /// <inheritdoc />
     public partial class AddCurrentDeviceStatusTable : Migration

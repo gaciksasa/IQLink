@@ -1,13 +1,13 @@
-﻿using DeviceDataCollector.Data;
-using DeviceDataCollector.Models;
-using DeviceDataCollector.Services;
+﻿using IQLink.Data;
+using IQLink.Models;
+using IQLink.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text;
 
-namespace DeviceDataCollector.Areas.LipoDoc.Controllers
+namespace IQLink.Areas.LipoDoc.Controllers
 {
     [Area("LipoDoc")]
     [Authorize]

@@ -1,8 +1,8 @@
-using DeviceDataCollector.Data;
+using IQLink.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DeviceDataCollector.Services
+namespace IQLink.Services
 {
     public class DbContextFactory
     {

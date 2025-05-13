@@ -1,10 +1,10 @@
 ﻿// Controllers/HomeController.cs (root area, not LipoDoc area)
 using Microsoft.AspNetCore.Mvc;
-using DeviceDataCollector.Services;
-using DeviceDataCollector.Models;
+using IQLink.Services;
+using IQLink.Models;
 using System.Diagnostics;
 
-namespace DeviceDataCollector.Controllers
+namespace IQLink.Controllers
 {
     public class HomeController : Controller
     {

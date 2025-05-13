@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using DeviceDataCollector.Services;
+using IQLink.Services;
 
-namespace DeviceDataCollector.Models
+namespace IQLink.Models
 {
     public class BackupViewModel
     {

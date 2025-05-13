@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using DeviceDataCollector.Models;
-using DeviceDataCollector.Services;
-using DeviceDataCollector.Data;
+using IQLink.Models;
+using IQLink.Services;
+using IQLink.Data;
 using Microsoft.EntityFrameworkCore;
-using DeviceDataCollector.Areas.LipoDoc.Models;
+using IQLink.Areas.LipoDoc.Models;
 
-namespace DeviceDataCollector.Areas.LipoDoc.Controllers
+namespace IQLink.Areas.LipoDoc.Controllers
 {
     [Area("LipoDoc")]
     public class HomeController : Controller

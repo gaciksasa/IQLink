@@ -1,7 +1,7 @@
-﻿using DeviceDataCollector.Data;
+﻿using IQLink.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace DeviceDataCollector.Services
+namespace IQLink.Services
 {
     public class DatabaseStatusService
     {

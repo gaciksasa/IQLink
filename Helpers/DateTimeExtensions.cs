@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DeviceDataCollector.Helpers
+namespace IQLink.Helpers
 {
     public static class DateTimeExtensions
     {

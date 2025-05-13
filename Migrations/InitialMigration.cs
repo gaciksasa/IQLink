@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace DeviceDataCollector.Migrations
+namespace IQLink.Migrations
 {
     public partial class RenameDeviceDataToDonationsData : Migration
     {

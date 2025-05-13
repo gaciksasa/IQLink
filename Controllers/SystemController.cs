@@ -1,11 +1,11 @@
-﻿using DeviceDataCollector.Models;
-using DeviceDataCollector.Services;
+﻿using IQLink.Models;
+using IQLink.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
 
-namespace DeviceDataCollector.Controllers
+namespace IQLink.Controllers
 {
     [Authorize(Policy = "RequireAdminRole")]
     public class SystemController : Controller

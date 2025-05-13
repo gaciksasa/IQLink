@@ -1,8 +1,8 @@
-﻿using DeviceDataCollector.Data;
-using DeviceDataCollector.Models;
+﻿using IQLink.Data;
+using IQLink.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DeviceDataCollector.Services
+namespace IQLink.Services
 {
     public class AuthService
     {

@@ -1,8 +1,8 @@
-using DeviceDataCollector.Data;
+using IQLink.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DeviceDataCollector.Areas.LipoDoc.Controllers
+namespace IQLink.Areas.LipoDoc.Controllers
 {
     /// <summary>
     /// Base controller for all LipoDoc controllers

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 
-namespace DeviceDataCollector.Services
+namespace IQLink.Services
 {
     public class ScheduledBackupService : BackgroundService
     {

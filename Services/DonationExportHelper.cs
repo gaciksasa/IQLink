@@ -1,9 +1,9 @@
-﻿using DeviceDataCollector.Data;
-using DeviceDataCollector.Models;
+﻿using IQLink.Data;
+using IQLink.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
-namespace DeviceDataCollector.Services
+namespace IQLink.Services
 {
     /// <summary>
     /// Helper service for exporting donations - used by both the AutoExportService 

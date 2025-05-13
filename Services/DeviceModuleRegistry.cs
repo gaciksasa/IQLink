@@ -1,6 +1,6 @@
-﻿using DeviceDataCollector.Models;
+﻿using IQLink.Models;
 
-namespace DeviceDataCollector.Services
+namespace IQLink.Services
 {
     public class DeviceModuleRegistry
     {

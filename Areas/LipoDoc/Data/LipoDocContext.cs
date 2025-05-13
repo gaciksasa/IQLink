@@ -1,7 +1,7 @@
-﻿using DeviceDataCollector.Models;
+﻿using IQLink.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DeviceDataCollector.Areas.LipoDoc.Data
+namespace IQLink.Areas.LipoDoc.Data
 {
     public class LipoDocContext : DbContext
     {

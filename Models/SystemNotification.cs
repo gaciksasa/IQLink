@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace DeviceDataCollector.Models
+namespace IQLink.Models
 {
     public class SystemNotification
     {

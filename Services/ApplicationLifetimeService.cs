@@ -1,4 +1,4 @@
-﻿namespace DeviceDataCollector.Services
+﻿namespace IQLink.Services
 {
     public class ApplicationLifetimeService
     {

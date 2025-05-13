@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace DeviceDataCollector.Data
+namespace IQLink.Data
 {
     public abstract class BaseDeviceDbContext : DbContext
     {

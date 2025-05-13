@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text;
 
-namespace DeviceDataCollector.Services
+namespace IQLink.Services
 {
     public class DatabaseConfigService
     {

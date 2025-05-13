@@ -1,7 +1,7 @@
-﻿@model DeviceDataCollector.Controllers.PaginatedList<DeviceDataCollector.Models.DonationsData>
+﻿@model IQLink.Controllers.PaginatedList<IQLink.Models.DonationsData>
 
 @{
-    var device = ViewBag.Device as DeviceDataCollector.Models.Device;
+    var device = ViewBag.Device as IQLink.Models.Device;
     ViewData["Title"] = $"Donations from {device.Name}";
 }
 

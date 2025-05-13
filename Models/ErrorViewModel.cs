@@ -1,4 +1,4 @@
-namespace DeviceDataCollector.Models
+namespace IQLink.Models
 {
     public class ErrorViewModel
     {

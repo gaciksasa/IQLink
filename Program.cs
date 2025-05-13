@@ -1,8 +1,8 @@
-using DeviceDataCollector.Areas.LipoDoc.Data;
-using DeviceDataCollector.Areas.LipoDoc.Services;
-using DeviceDataCollector.Data;
-using DeviceDataCollector.Middleware;
-using DeviceDataCollector.Services;
+using IQLink.Areas.LipoDoc.Data;
+using IQLink.Areas.LipoDoc.Services;
+using IQLink.Data;
+using IQLink.Middleware;
+using IQLink.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 

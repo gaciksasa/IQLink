@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace DeviceDataCollector.Services
+namespace IQLink.Services
 {
     public class ViewContextAccessor : IViewContextAccessor
     {

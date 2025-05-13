@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace DeviceDataCollector.Models
+namespace IQLink.Models
 {
     public class ExportViewModel
     {

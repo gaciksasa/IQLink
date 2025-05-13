@@ -1,11 +1,11 @@
-﻿using DeviceDataCollector.Data;
-using DeviceDataCollector.Models;
-using DeviceDataCollector.Services;
+﻿using IQLink.Data;
+using IQLink.Models;
+using IQLink.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace DeviceDataCollector.Controllers
+namespace IQLink.Controllers
 {
     [Authorize]
     public class DevicesController : Controller
@@ -221,7 +221,7 @@ namespace DeviceDataCollector.Controllers
                         }
 
                         // Queue the new serial number update command
-                        var commService = HttpContext.RequestServices.GetRequiredService<DeviceDataCollector.Services.DeviceCommunicationService>();
+                        var commService = HttpContext.RequestServices.GetRequiredService<IQLink.Services.DeviceCommunicationService>();
                         var (success, response, _) = await commService.UpdateSerialNumberAsync(
                             existingDevice.SerialNumber,
                             NewSerialNumber);
@@ -467,7 +467,7 @@ namespace DeviceDataCollector.Controllers
                 return RedirectToAction(nameof(Details), new { id = id });
             }
 
-            var commService = HttpContext.RequestServices.GetRequiredService<DeviceDataCollector.Services.DeviceCommunicationService>();
+            var commService = HttpContext.RequestServices.GetRequiredService<IQLink.Services.DeviceCommunicationService>();
             bool success = commService.RequestDeviceSetup(device.SerialNumber);
 
             if (success)

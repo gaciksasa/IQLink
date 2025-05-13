@@ -1,6 +1,6 @@
-﻿using DeviceDataCollector.Models;
+﻿using IQLink.Models;
 
-namespace DeviceDataCollector.Areas.LipoDoc.Models
+namespace IQLink.Areas.LipoDoc.Models
 {
     public class DashboardViewModel
     {

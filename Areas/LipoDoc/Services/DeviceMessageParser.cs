@@ -1,8 +1,8 @@
-﻿using DeviceDataCollector.Models;
+﻿using IQLink.Models;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace DeviceDataCollector.Services
+namespace IQLink.Services
 {
     public class DeviceMessageParser
     {

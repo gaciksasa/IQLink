@@ -1,6 +1,6 @@
-﻿using DeviceDataCollector.Data;
-using DeviceDataCollector.Models;
-using DeviceDataCollector.Services;
+﻿using IQLink.Data;
+using IQLink.Models;
+using IQLink.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace DeviceDataCollector.Controllers
+namespace IQLink.Controllers
 {
     public class AccountController : Controller
     {

@@ -1,7 +1,7 @@
-﻿@model DeviceDataCollector.Models.DeviceSetup
+﻿@model IQLink.Models.DeviceSetup
 
 @{
-    var device = ViewBag.Device as DeviceDataCollector.Models.Device;
+    var device = ViewBag.Device as IQLink.Models.Device;
     ViewData["Title"] = $"Device Setup - {device.Name}";
 }
 

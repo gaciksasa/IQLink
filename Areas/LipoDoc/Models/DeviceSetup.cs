@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DeviceDataCollector.Models
+namespace IQLink.Models
 {
     public class DeviceSetup
     {

@@ -1,14 +1,14 @@
-﻿using DeviceDataCollector.Data;
-using DeviceDataCollector.Models;
+﻿using IQLink.Data;
+using IQLink.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
-using static DeviceDataCollector.Services.DeviceMessageParser;
+using static IQLink.Services.DeviceMessageParser;
 
-namespace DeviceDataCollector.Services
+namespace IQLink.Services
 {
     public class TCPServerService : BackgroundService
     {
