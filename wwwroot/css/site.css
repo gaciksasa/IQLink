@@ -747,3 +747,91 @@ a.badge {
 .nav-pills .nav-link:not(.active):hover {
     background-color: rgba(var(--bs-primary-rgb), 0.1);
 }
+
+
+
+
+
+/* Custom styles for IQ Link */
+
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --light-color: #f8f9fa;
+}
+
+/* General styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+/* Card styling */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
+}
+
+/* Navbar customization */
+.navbar {
+    padding: 0.7rem 1rem;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Footer styling */
+.footer {
+    background-color: var(--light-color);
+    border-top: 1px solid #dee2e6;
+}
+
+/* Device card styles */
+.device-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .device-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+/* Status indicators */
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.status-active {
+    background-color: var(--success-color);
+}
+
+.status-inactive {
+    background-color: var(--secondary-color);
+}
+
+/* Enhanced button styling */
+.btn-primary {
+    padding: 0.375rem 1rem;
+}
+
+    .btn-primary:hover {
+        box-shadow: 0 0.125rem 0.25rem rgba(13, 110, 253, 0.4);
+    }

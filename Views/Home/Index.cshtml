@@ -4,33 +4,35 @@
 }
 
 <div class="container">
-    <div class="text-center mb-5">
+    <div class="text-center mb-4">
         <h1 class="display-4">Device Data Collector Hub</h1>
         <p class="lead">Select a device type to manage</p>
     </div>
 
     <!-- Server Status Card -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Server Status</h5>
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Server Status</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="status-indicator status-active me-2"></span>
+                        <strong>Server is running at:</strong>
+                        <span class="ms-2">@(Context.Request.Host.Host):@(Context.Request.Host.Port)</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="status-indicator status-active me-2"></span>
+                        <strong>TCP Port Status:</strong>
+                        <span class="ms-2 text-success">Listening on port 5000</span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-lg-6">
-                            <div><strong>Server is running at:</strong> @(Context.Request.Host.Host):@(Context.Request.Host.Port)</div>
-
-                            <div>
-                                <strong>TCP Port Status:</strong>
-                                <span class="text-success">Listening on port 5000</span>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <p>
-                                <strong>System Time:</strong><br>
-                                <span id="currentDateTime">@DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")</span>
-                            </p>
+                <div class="col-md-6 mt-3 mt-md-0">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <strong>System Time:</strong><br>
+                            <span id="currentDateTime" class="fs-5">@DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")</span>
                         </div>
                     </div>
                 </div>
@@ -38,23 +40,24 @@
         </div>
     </div>
 
-    <!-- Device Modules Cards -->
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
+    <!-- Available Devices Section -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="card device-card h-100">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">LipoDoc</h5>
                 </div>
-                <div class="card-body text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-droplet-fill" style="font-size: 3rem;"></i>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-droplet-fill text-primary" style="font-size: 3rem;"></i>
                     </div>
-                    <p>Blood donation lipemic monitoring system</p>
-                    <p class="text-muted small">Version: 1.0</p>
+                    <h6 class="card-title">Blood donation lipemic monitoring system</h6>
+                    <p class="card-text text-muted">Monitor and manage lipemic samples from blood donations.</p>
+                    <div class="text-muted small mb-3">Version: 1.0</div>
                 </div>
-                <div class="card-footer">
-                    <a href="/LipoDoc/Home/Index" class="btn btn-primary d-block">
-                        <i class="bi bi-box-arrow-in-right"></i> Launch LipoDoc
+                <div class="card-footer bg-white border-top-0">
+                    <a href="/LipoDoc/Home/Index" class="btn btn-primary w-100">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Launch LipoDoc
                     </a>
                 </div>
             </div>
