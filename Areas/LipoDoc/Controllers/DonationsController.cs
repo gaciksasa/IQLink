@@ -1,27 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DeviceDataCollector.Data;
-using Microsoft.AspNetCore.Authorization;
+﻿using DeviceDataCollector.Data;
 using DeviceDataCollector.Models;
-using DeviceDataCollector.Areas.LipoDoc.Controllers;
-using System.Text;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DeviceDataCollector.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text;
 
 namespace DeviceDataCollector.Areas.LipoDoc.Controllers
 {
-    [Authorize] // Require authentication for all actions
-    public class DonationsController : LipoDocBaseController
+    [Area("LipoDoc")]
+    [Authorize]
+    public class DonationsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<DonationsController> _logger;
+        private readonly DonationExportHelper _exportHelper;
         private readonly int _pageSize = 20; // Default page size
 
-        // GET: Donations
+        public DonationsController(
+            ApplicationDbContext context,
+            ILogger<DonationsController> logger,
+            DonationExportHelper exportHelper)
+        {
+            _context = context;
+            _logger = logger;
+            _exportHelper = exportHelper;
+        }
+
+        // GET: LipoDoc/Donations
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber, bool? todayOnly = null)
         {
             ViewBag.CurrentSort = sortOrder;
@@ -31,7 +38,7 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             ViewBag.LipemicValueSortParm = sortOrder == "lipemic_value" ? "lipemic_value_desc" : "lipemic_value";
             ViewBag.LipemicGroupSortParm = sortOrder == "lipemic_group" ? "lipemic_group_desc" : "lipemic_group";
 
-            // Fix: Make sure todayOnly is properly handled with a default value of true
+            // Make sure todayOnly is properly handled with a default value of true
             bool todayOnlyValue = todayOnly ?? true;
             ViewBag.TodayOnly = todayOnlyValue;
 
@@ -107,7 +114,7 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             // Check if it's an AJAX request for auto-refresh
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
-                // For AJAX requests, we'll use the current page number from the request
+                // For AJAX requests, use the current page number from the request
                 // This allows us to refresh data for the current page the user is viewing
                 var ajaxPageIndex = pageNumber ?? 1;
                 var ajaxPageData = await query
@@ -126,7 +133,7 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             return View(paginatedList);
         }
 
-        // GET: Donations/Details/5
+        // GET: LipoDoc/Donations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -144,7 +151,7 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             return View(donationData);
         }
 
-        // GET: Donations/Edit/5
+        // GET: LipoDoc/Donations/Edit/5
         [Authorize(Policy = "RequireAdminRole")] // Only admins can edit
         public async Task<IActionResult> Edit(int? id)
         {
@@ -161,7 +168,7 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             return View(donationData);
         }
 
-        // POST: Donations/Edit/5
+        // POST: LipoDoc/Donations/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "RequireAdminRole")] // Only admins can edit
@@ -197,7 +204,7 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             return View(donationData);
         }
 
-        // GET: Donations/Delete/5
+        // GET: LipoDoc/Donations/Delete/5
         [Authorize(Policy = "RequireAdminRole")] // Only admins can delete
         public async Task<IActionResult> Delete(int? id)
         {
@@ -216,7 +223,7 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             return View(donationData);
         }
 
-        // POST: Donations/Delete/5
+        // POST: LipoDoc/Donations/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "RequireAdminRole")] // Only admins can delete
@@ -252,20 +259,20 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             var model = new ExportViewModel
             {
                 AvailableColumns = new List<ColumnSelectionItem>
-        {
-            new ColumnSelectionItem { Id = "DonationIdBarcode", Name = "Donation ID", Selected = true },
-            new ColumnSelectionItem { Id = "DeviceId", Name = "Device ID", Selected = true },
-            new ColumnSelectionItem { Id = "Timestamp", Name = "Timestamp", Selected = true },
-            new ColumnSelectionItem { Id = "LipemicValue", Name = "Lipemic Value", Selected = true },
-            new ColumnSelectionItem { Id = "LipemicGroup", Name = "Lipemic Group", Selected = true },
-            new ColumnSelectionItem { Id = "LipemicStatus", Name = "Lipemic Status", Selected = true },
-            new ColumnSelectionItem { Id = "RefCode", Name = "Reference Code", Selected = false },
-            new ColumnSelectionItem { Id = "OperatorIdBarcode", Name = "Operator ID", Selected = true },
-            new ColumnSelectionItem { Id = "LotNumber", Name = "Lot Number", Selected = true },
-            new ColumnSelectionItem { Id = "MessageType", Name = "Message Type", Selected = false },
-            new ColumnSelectionItem { Id = "IPAddress", Name = "IP Address", Selected = false },
-            new ColumnSelectionItem { Id = "Port", Name = "Port", Selected = false }
-        },
+                {
+                    new ColumnSelectionItem { Id = "DonationIdBarcode", Name = "Donation ID", Selected = true },
+                    new ColumnSelectionItem { Id = "DeviceId", Name = "Device ID", Selected = true },
+                    new ColumnSelectionItem { Id = "Timestamp", Name = "Timestamp", Selected = true },
+                    new ColumnSelectionItem { Id = "LipemicValue", Name = "Lipemic Value", Selected = true },
+                    new ColumnSelectionItem { Id = "LipemicGroup", Name = "Lipemic Group", Selected = true },
+                    new ColumnSelectionItem { Id = "LipemicStatus", Name = "Lipemic Status", Selected = true },
+                    new ColumnSelectionItem { Id = "RefCode", Name = "Reference Code", Selected = false },
+                    new ColumnSelectionItem { Id = "OperatorIdBarcode", Name = "Operator ID", Selected = true },
+                    new ColumnSelectionItem { Id = "LotNumber", Name = "Lot Number", Selected = true },
+                    new ColumnSelectionItem { Id = "MessageType", Name = "Message Type", Selected = false },
+                    new ColumnSelectionItem { Id = "IPAddress", Name = "IP Address", Selected = false },
+                    new ColumnSelectionItem { Id = "Port", Name = "Port", Selected = false }
+                },
                 Delimiter = ",",
                 DateFormat = "yyyy-MM-dd",
                 TimeFormat = "HH:mm:ss",
@@ -409,22 +416,23 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
 
                 // Assign to model
                 model.AvailableDevices = deviceItems;
-
-                _logger.LogInformation($"Populated device dropdown with {deviceItems.Count - 1} devices");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading device list for export dropdown");
                 // Create a default empty list with just the "All Devices" option
                 model.AvailableDevices = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "", Text = "-- All Devices --" }
-        };
+                {
+                    new SelectListItem { Value = "", Text = "-- All Devices --" }
+                };
             }
 
-            // Set default date range to last 30 days
-            model.StartDate = DateTime.Now.AddDays(-30).Date;
-            model.EndDate = DateTime.Now.Date;
+            // Set default date range to last 30 days if not set
+            if (!model.StartDate.HasValue)
+                model.StartDate = DateTime.Now.AddDays(-30).Date;
+
+            if (!model.EndDate.HasValue)
+                model.EndDate = DateTime.Now.Date;
 
             return View(model);
         }
@@ -608,7 +616,9 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
                 EmptyColumnsCount = model.EmptyColumnsCount,
                 ExportFolderPath = model.ExportFolderPath,
                 CustomFileName = model.CustomFileName ?? "Manual_Export",
-                AutoExportMode = model.AutoExportMode
+                AutoExportMode = model.AutoExportMode,
+                CreatedBy = User.Identity?.Name,
+                CreatedAt = DateTime.Now
             };
         }
 
@@ -706,13 +716,6 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             }
         }
 
-        // GET: Donations/ExportSettings
-        public async Task<IActionResult> ExportSettings()
-        {
-            // Redirect to Export action to consolidate functionality
-            return RedirectToAction(nameof(Export));
-        }
-
         // POST: Donations/SaveExportSettings
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -804,7 +807,7 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             }
         }
 
-        // Modified DeleteExportSettings action to return to Export view
+        // DELETE: Donations/DeleteExportSettings
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteExportSettings(int id)
@@ -843,11 +846,10 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
                 TempData["ErrorMessage"] = $"Error deleting configuration: {ex.Message}";
             }
 
-            // Return to Export view instead of ExportSettings
             return RedirectToAction(nameof(Export));
         }
 
-        // Modified SetDefaultExportSettings action to return to Export view
+        // SET DEFAULT: Donations/SetDefaultExportSettings
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetDefaultExportSettings(int id)
@@ -880,24 +882,10 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
                 TempData["ErrorMessage"] = $"Error setting default configuration: {ex.Message}";
             }
 
-            // Return to Export view instead of ExportSettings
             return RedirectToAction(nameof(Export));
         }
 
-        private readonly DonationExportHelper _exportHelper;
-
-        // Update the constructor to include the export helper
-        public DonationsController(
-            ApplicationDbContext context,
-            ILogger<DonationsController> logger,
-            DonationExportHelper exportHelper)
-        {
-            _context = context;
-            _logger = logger;
-            _exportHelper = exportHelper;
-        }
-
-        // Add this method to the class - we'll call it when processing TCPServer messages
+        // Helper method for triggering auto-exports
         public async Task TriggerAutoExportAsync(DonationsData donation)
         {
             if (donation == null)
@@ -915,7 +903,7 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             }
         }
 
-        // Add to the CreateDonation method (if it exists) or to where donations are added to the database
+        // Helper method for creating new donations with auto-export
         private async Task<int> CreateDonationAsync(DonationsData donation)
         {
             // Add to database
@@ -926,6 +914,30 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
             await TriggerAutoExportAsync(donation);
 
             return donation.Id;
+        }
+    }
+
+    // Helper class for pagination
+    public class PaginatedList<T> : List<T>
+    {
+        public int PageIndex { get; private set; }
+        public int TotalPages { get; private set; }
+
+        public PaginatedList(List<T> items, int count, int pageIndex, int pageSize)
+        {
+            PageIndex = pageIndex;
+            TotalPages = (int)Math.Ceiling(count / (double)pageSize);
+            this.AddRange(items);
+        }
+
+        public bool HasPreviousPage => PageIndex > 1;
+        public bool HasNextPage => PageIndex < TotalPages;
+
+        public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int pageIndex, int pageSize)
+        {
+            var count = await source.CountAsync();
+            var items = await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            return new PaginatedList<T>(items, count, pageIndex, pageSize);
         }
     }
 }

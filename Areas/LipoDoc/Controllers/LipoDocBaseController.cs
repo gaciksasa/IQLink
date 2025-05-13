@@ -1,4 +1,4 @@
-using DeviceDataCollector.Areas.LipoDoc.Data;
+using DeviceDataCollector.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +12,6 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
     [Authorize]
     public abstract class LipoDocBaseController : Controller
     {
-        protected readonly LipoDocDbContext _context;
         protected readonly ILogger _logger;
 
         /// <summary>
@@ -20,9 +19,8 @@ namespace DeviceDataCollector.Areas.LipoDoc.Controllers
         /// </summary>
         /// <param name="context">The LipoDoc database context</param>
         /// <param name="logger">Logger instance</param>
-        protected LipoDocBaseController(LipoDocDbContext context, ILogger logger)
+        protected LipoDocBaseController(ILogger logger)
         {
-            _context = context;
             _logger = logger;
         }
 
