@@ -1,8 +1,6 @@
-using IQLink.Areas.LipoDoc.Data;
-using IQLink.Areas.LipoDoc.Services;
 using IQLink.Data;
-using IQLink.Middleware;
 using IQLink.Services;
+using IQLink.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 

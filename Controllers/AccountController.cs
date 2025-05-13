@@ -29,7 +29,7 @@ namespace IQLink.Controllers
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl ?? "/";
             return View();
         }
 
@@ -37,7 +37,7 @@ namespace IQLink.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl ?? "/";
 
             if (ModelState.IsValid)
             {
