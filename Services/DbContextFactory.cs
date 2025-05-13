@@ -34,9 +34,11 @@ namespace IQLink.Services
 
             return deviceType.ToLower() switch
             {
-                "lipodoc" => (TContext)scope.ServiceProvider.GetRequiredService<LipoDocDbContext>(),
+                "lipodoc" => scope.ServiceProvider.GetRequiredService<LipoDocDbContext>() as TContext
+                            ?? throw new InvalidOperationException($"Cannot convert LipoDocDbContext to {typeof(TContext).Name}"),
                 // Add other device types here
-                _ => (TContext)scope.ServiceProvider.GetRequiredService<CoreDbContext>()
+                _ => scope.ServiceProvider.GetRequiredService<CoreDbContext>() as TContext
+                     ?? throw new InvalidOperationException($"Cannot convert CoreDbContext to {typeof(TContext).Name}")
             };
         }
     }
