@@ -1,0 +1,116 @@
+﻿@model IEnumerable<DeviceDataCollector.Models.DeviceModuleInfo>
+@{
+    ViewData["Title"] = "Device Hub";
+}
+
+<div class="container">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Device Data Collector Hub</h1>
+        <p class="lead">Select a device type to manage</p>
+    </div>
+
+    <!-- Server Status Card -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Server Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6">
+                            <div><strong>Server is running at:</strong> @(Context.Request.Host.Host):@(Context.Request.Host.Port)</div>
+
+                            <div>
+                                <strong>Database:</strong>
+                                @if (ViewBag.DatabaseConnected)
+                                {
+                                    <span class="text-success">@ViewBag.DatabaseStatus</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">@ViewBag.DatabaseStatus</span>
+                                    <div class="alert alert-warning mt-2">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        Database connection issue detected. Please check your connection string.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <p>
+                                <strong>System Time:</strong><br>
+                                <span id="currentDateTime">@DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Modules Cards -->
+    <div class="row">
+        @if (Model.Any())
+        {
+            @foreach (var module in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">@module.DisplayName</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="@module.IconClass bi-3x"></i>
+                            </div>
+                            <p>@module.Description</p>
+                            <p class="text-muted small">Version: @module.Version</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="@module.EntryUrl" class="btn btn-primary d-block">
+                                <i class="bi bi-box-arrow-in-right"></i> Launch @module.DisplayName
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i> No device modules are currently available. Please check your configuration.
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Update current date/time
+        function updateDateTime() {
+            const now = new Date();
+            const dateTimeStr = now.toLocaleString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(',', '');
+
+            document.getElementById('currentDateTime').innerText = dateTimeStr;
+        }
+
+        // Initialize and set intervals
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+}@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}

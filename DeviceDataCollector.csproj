@@ -20,7 +20,6 @@
 	<ItemGroup>
 		<Folder Include="Areas\LipoDoc\Controllers\" />
 		<Folder Include="Areas\LipoDoc\Data\" />
-		<Folder Include="Areas\LipoDoc\Models\" />
 		<Folder Include="Areas\LipoDoc\Services\" />
 		<Folder Include="Areas\LipoDoc\Views\" />
 	</ItemGroup>

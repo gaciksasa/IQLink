@@ -16,12 +16,23 @@
     <!-- Full-width top bar with primary color -->
     <header class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm theme-transition">
         <div class="container-fluid px-4">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">IQ Link</a>
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Device Hub</a>
             <button class="navbar-toggler navbar-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTop" aria-controls="navbarTop"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarTop">
+                <ul class="navbar-nav me-auto">
+                    @if (Context.Request.Path.StartsWithSegments("/LipoDoc"))
+                    {
+                        <li class="nav-item">
+                            <span class="nav-link">
+                                <i class="bi bi-droplet-fill"></i> LipoDoc
+                            </span>
+                        </li>
+                    }
+                    <!-- Other device areas would go here -->
+                </ul>
                 <div class="ms-auto d-flex align-items-center">
                     <!-- Theme Toggle Button -->
                     <button id="theme-toggle" class="btn btn-sm me-3 theme-transition">
@@ -36,7 +47,7 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li>
-                                    <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">
                                         <i class="bi bi-person"></i> My Profile
                                     </a>
                                 </li>
@@ -70,88 +81,130 @@
                 <!-- Sidebar navigation using Bootstrap grid -->
                 <div class="sidebar col-md-3 col-lg-2 bg-light pt-3 pb-3 theme-transition">
                     @{
+                        var areaName = ViewContext.RouteData.Values["Area"]?.ToString();
                         var controller = ViewContext.RouteData.Values["Controller"].ToString();
                         var action = ViewContext.RouteData.Values["Action"].ToString();
                         var isExportPage = controller == "Donations" && action == "Export";
                     }
-                    <ul class="nav nav-pills flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link @(controller == "Home" && action == "Index" ? "active" : "") theme-transition" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(controller == "Donations" && action != "Export" ? "active" : "") theme-transition" asp-controller="Donations" asp-action="Index">
-                                <i class="bi bi-droplet"></i> Donations
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(controller == "Devices" ? "active" : "") theme-transition" asp-controller="Devices" asp-action="Index">
-                                <i class="bi bi-hdd-network"></i> Devices
-                            </a>
-                        </li>
-                        @if (User.IsInRole("Admin"))
-                        {
+
+                    @if (string.IsNullOrEmpty(areaName))
+                    {
+                        <!-- Root area (Hub) navigation -->
+                        <ul class="nav nav-pills flex-column">
                             <li class="nav-item">
-                                <a class="nav-link @(controller == "Users" ? "active" : "") theme-transition" asp-controller="Users" asp-action="Index">
-                                    <i class="bi bi-person-gear"></i> Users
+                                <a class="nav-link @(controller == "Home" && action == "Index" ? "active" : "") theme-transition" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house"></i> Device Hub
                                 </a>
                             </li>
 
-                            <!-- Settings Accordion -->
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(controller == "Users" ? "active" : "") theme-transition" asp-controller="Users" asp-action="Index">
+                                        <i class="bi bi-person-gear"></i> Users
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link @(controller == "System" ? "active" : "") theme-transition" asp-controller="System" asp-action="Network">
+                                        <i class="bi bi-gear"></i> System Settings
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else if (areaName == "LipoDoc")
+                    {
+                        <!-- LipoDoc area navigation -->
+                        <a href="@Url.Action("Index", "Home", new { area = "" })" class="btn btn-outline-secondary mb-3 w-100">
+                            <i class="bi bi-house"></i> Return to Hub
+                        </a>
+
+                        <!-- Keep existing LipoDoc navigation items -->
+                        <ul class="nav nav-pills flex-column">
                             <li class="nav-item">
-                                @{
-                                    bool shouldExpandAccordion = isExportPage;
-                                }
-                                <div class="accordion" id="settingsAccordion">
-                                    <div class="accordion-item border-0">
-                                        <h2 class="accordion-header" id="settingsHeading">
-                                            <button class="accordion-button @(shouldExpandAccordion ? "" : "collapsed") px-3 py-2 @(controller == "System" || isExportPage ? "text-primary" : "")"
-                                                    type="button"
-                                                    data-bs-toggle="collapse"
-                                                    data-bs-target="#settingsCollapse"
-                                                    aria-expanded="@(shouldExpandAccordion ? "true" : "false")"
-                                                    aria-controls="settingsCollapse">
-                                                <i class="bi bi-gear me-2"></i> Settings
-                                            </button>
-                                        </h2>
-                                        <div id="settingsCollapse" class="accordion-collapse @(shouldExpandAccordion ? "show" : "collapse")" aria-labelledby="settingsHeading" data-bs-parent="#settingsAccordion">
-                                            <div class="accordion-body py-1 px-0">
-                                                <ul class="nav nav-pills flex-column">
-                                                    <li class="nav-item">
-                                                        <a class="nav-link @(controller == "System" && action == "Network" ? "active" : "") theme-transition ps-5"
-                                                           asp-controller="System" asp-action="Network">
-                                                            <i class="bi bi-hdd-network"></i> Network
-                                                        </a>
-                                                    </li>
-                                                    <!-- You can add more settings items here -->
-                                                    <li class="nav-item">
-                                                        <a class="nav-link @(controller == "System" && action == "Database" ? "active" : "") theme-transition ps-5"
-                                                           asp-controller="System" asp-action="Database">
-                                                            <i class="bi bi-database"></i> Database
-                                                        </a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link @(controller == "System" && action == "Backup" ? "active" : "") theme-transition ps-5"
-                                                           asp-controller="System" asp-action="Backup">
-                                                            <i class="bi bi-cloud-arrow-up"></i> Backup
-                                                        </a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link @(controller == "Donations" && action == "Export" ? "active" : "") theme-transition ps-5"
-                                                           asp-controller="Donations" asp-action="Export">
-                                                            <i class="bi bi-box-arrow-in-right"></i> Export
-                                                        </a>
-                                                    </li>
-                                                </ul>
+                                <a class="nav-link @(controller == "Home" && action == "Index" ? "active" : "") theme-transition" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(controller == "Donations" && action != "Export" ? "active" : "") theme-transition" asp-controller="Donations" asp-action="Index">
+                                    <i class="bi bi-droplet"></i> Donations
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(controller == "Devices" ? "active" : "") theme-transition" asp-controller="Devices" asp-action="Index">
+                                    <i class="bi bi-hdd-network"></i> Devices
+                                </a>
+                            </li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(controller == "Users" ? "active" : "") theme-transition" asp-controller="Users" asp-action="Index">
+                                        <i class="bi bi-person-gear"></i> Users
+                                    </a>
+                                </li>
+
+                                <!-- Settings Accordion -->
+                                <li class="nav-item">
+                                    @{
+                                        bool shouldExpandAccordion = isExportPage;
+                                    }
+                                    <div class="accordion" id="settingsAccordion">
+                                        <div class="accordion-item border-0">
+                                            <h2 class="accordion-header" id="settingsHeading">
+                                                <button class="accordion-button @(shouldExpandAccordion ? "" : "collapsed") px-3 py-2 @(controller == "System" || isExportPage ? "text-primary" : "")"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#settingsCollapse"
+                                                        aria-expanded="@(shouldExpandAccordion ? "true" : "false")"
+                                                        aria-controls="settingsCollapse">
+                                                    <i class="bi bi-gear me-2"></i> Settings
+                                                </button>
+                                            </h2>
+                                            <div id="settingsCollapse" class="accordion-collapse @(shouldExpandAccordion ? "show" : "collapse")" aria-labelledby="settingsHeading" data-bs-parent="#settingsAccordion">
+                                                <div class="accordion-body py-1 px-0">
+                                                    <ul class="nav nav-pills flex-column">
+                                                        <li class="nav-item">
+                                                            <a class="nav-link @(controller == "System" && action == "Network" ? "active" : "") theme-transition ps-5"
+                                                               asp-controller="System" asp-action="Network">
+                                                                <i class="bi bi-hdd-network"></i> Network
+                                                            </a>
+                                                        </li>
+                                                        <!-- You can add more settings items here -->
+                                                        <li class="nav-item">
+                                                            <a class="nav-link @(controller == "System" && action == "Database" ? "active" : "") theme-transition ps-5"
+                                                               asp-controller="System" asp-action="Database">
+                                                                <i class="bi bi-database"></i> Database
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link @(controller == "System" && action == "Backup" ? "active" : "") theme-transition ps-5"
+                                                               asp-controller="System" asp-action="Backup">
+                                                                <i class="bi bi-cloud-arrow-up"></i> Backup
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link @(controller == "Donations" && action == "Export" ? "active" : "") theme-transition ps-5"
+                                                               asp-controller="Donations" asp-action="Export">
+                                                                <i class="bi bi-box-arrow-in-right"></i> Export
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </li>
-                        }
-                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    <!-- Add other area navigations here -->
                 </div>
+            }
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
                 <!-- Main content area -->
                 <div class="main col-md-9 col-lg-10 p-4">
                     @RenderBody()
