@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace IQLink.Controllers
+namespace IQLink.Areas.LipoDoc.Controllers
 {
+    [Area("LipoDoc")]
     [Authorize]
     public class DevicesController : Controller
     {
