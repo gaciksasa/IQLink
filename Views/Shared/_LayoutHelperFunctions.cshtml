@@ -1,10 +1,19 @@
-﻿@using Microsoft.AspNetCore.Mvc.Rendering
+﻿// File: Views/Shared/_LayoutHelperFunctions.cshtml
+
+@using Microsoft.AspNetCore.Mvc.Rendering
 
 @functions {
-    public static string IsActive(ViewContext viewContext, string controller, string action = "")
+    public static string IsActive(ViewContext viewContext, string controller, string action = "", string area = "")
     {
-        string currentController = viewContext.RouteData.Values["Controller"].ToString();
-        string currentAction = viewContext.RouteData.Values["Action"].ToString();
+        string currentController = viewContext.RouteData.Values["Controller"]?.ToString() ?? "";
+        string currentAction = viewContext.RouteData.Values["Action"]?.ToString() ?? "";
+        string currentArea = viewContext.RouteData.Values["Area"]?.ToString() ?? "";
+
+        // Check if we're matching the correct area first
+        if (!string.IsNullOrEmpty(area) && !string.Equals(currentArea, area, StringComparison.OrdinalIgnoreCase))
+        {
+            return "";
+        }
 
         if (string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase))
         {
@@ -17,9 +26,16 @@
         return "";
     }
 
-    public static string IsActiveController(ViewContext viewContext, string controller)
+    public static string IsActiveController(ViewContext viewContext, string controller, string area = "")
     {
-        string currentController = viewContext.RouteData.Values["Controller"].ToString();
+        string currentController = viewContext.RouteData.Values["Controller"]?.ToString() ?? "";
+        string currentArea = viewContext.RouteData.Values["Area"]?.ToString() ?? "";
+
+        // Check if we're matching the correct area first
+        if (!string.IsNullOrEmpty(area) && !string.Equals(currentArea, area, StringComparison.OrdinalIgnoreCase))
+        {
+            return "";
+        }
 
         if (string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase))
         {

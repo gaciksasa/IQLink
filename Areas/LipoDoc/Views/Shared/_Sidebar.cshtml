@@ -1,54 +1,46 @@
-﻿<div class="position-sticky pt-3">
+﻿@using IQLink.Helpers
+
+<div class="sidebar-nav">
     <ul class="nav flex-column">
         <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")"
-               asp-area="LipoDoc" asp-controller="Home" asp-action="Index">
-                <i class="bi bi-house-door"></i>
-                Dashboard
+            <a class="nav-link @IsActiveLink("Home", "Index")" asp-area="LipoDoc" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-house"></i> Dashboard
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Devices" ? "active" : "")"
-               asp-area="LipoDoc" asp-controller="Devices" asp-action="Index">
-                <i class="bi bi-hdd-network"></i>
-                Devices
+            <a class="nav-link @IsActiveLink("Devices")" asp-area="LipoDoc" asp-controller="Devices" asp-action="Index">
+                <i class="bi bi-hdd-network"></i> Devices
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Donations" ? "active" : "")"
-               asp-area="LipoDoc" asp-controller="Donations" asp-action="Index">
-                <i class="bi bi-droplet"></i>
-                Donations
+            <a class="nav-link @IsActiveLink("Donations")" asp-area="LipoDoc" asp-controller="Donations" asp-action="Index">
+                <i class="bi bi-droplet"></i> Donations
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Donations" && ViewContext.RouteData.Values["Action"].ToString() == "Export" ? "active" : "")"
-               asp-area="LipoDoc" asp-controller="Donations" asp-action="Export">
-                <i class="bi bi-box-arrow-right"></i>
-                Export
-            </a>
-        </li>
-        @if (User.IsInRole("Admin"))
-        {
-            <li class="nav-item mt-3">
-                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                    <span>Administration</span>
-                </h6>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "System" ? "active" : "")"
-                   asp-area="" asp-controller="System" asp-action="Network">
-                    <i class="bi bi-gear"></i>
-                    System Settings
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Users" ? "active" : "")"
-                   asp-area="" asp-controller="Users" asp-action="Index">
-                    <i class="bi bi-people"></i>
-                    User Management
-                </a>
-            </li>
-        }
     </ul>
 </div>
+
+@functions {
+    public string IsActiveLink(string controller, string action = "")
+    {
+        string currentController = ViewContext.RouteData.Values["Controller"]?.ToString() ?? "";
+        string currentAction = ViewContext.RouteData.Values["Action"]?.ToString() ?? "";
+        string currentArea = ViewContext.RouteData.Values["Area"]?.ToString() ?? "";
+
+        // Always check that we're in the LipoDoc area
+        if (currentArea != "LipoDoc")
+        {
+            return "";
+        }
+
+        if (string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.IsNullOrEmpty(action) || string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase))
+            {
+                return "active";
+            }
+        }
+
+        return "";
+    }
+}

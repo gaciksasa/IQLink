@@ -3,6 +3,7 @@ using IQLink.Services;
 using IQLink.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using IQLink.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +88,12 @@ builder.Services.AddSingleton<ApplicationLifetimeService>();
 builder.Services.AddScoped<DeviceCommunicationService>();
 builder.Services.AddHostedService<AutoExportService>();
 builder.Services.AddScoped<DonationExportHelper>();
+builder.Services.AddSingleton<IViewContextAccessor, ViewContextAccessor>();
+
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add<ViewContextFilter>();
+});
 
 var app = builder.Build();
 

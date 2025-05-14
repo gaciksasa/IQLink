@@ -14,10 +14,6 @@ html {
     }
 }
 
-body {
-    margin-bottom: 60px;
-}
-
 /* Override Bootstrap's default colors - monochromatic pink theme */
 :root {
     /* Primary pink color and variants */
