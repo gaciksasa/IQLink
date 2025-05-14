@@ -1,0 +1,21 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar - 3 columns wide on medium and larger screens -->
+        <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            @await Html.PartialAsync("_Sidebar")
+        </div>
+
+        <!-- Main content area - 9 columns wide on medium, 10 on larger screens -->
+        <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}
