@@ -1,27 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using IQLink.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace IQLink.Filters
 {
     public class ViewContextFilter : IActionFilter
     {
-        private readonly IViewContextAccessor _viewContextAccessor;
-
-        public ViewContextFilter(IViewContextAccessor viewContextAccessor)
-        {
-            _viewContextAccessor = viewContextAccessor;
-        }
-
         public void OnActionExecuting(ActionExecutingContext context)
         {
+            // Nothing to do here
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            if (context.Controller is Controller controller)
+            if (context.Result is ViewResult viewResult)
             {
-                _viewContextAccessor.ViewContext = controller.ViewContext;
+                // ViewContext is available in view, so no need to do anything here
             }
         }
     }
