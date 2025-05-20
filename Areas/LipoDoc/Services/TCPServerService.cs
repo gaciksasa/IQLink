@@ -276,7 +276,7 @@ namespace IQLink.Services
 
                         // Store the response in the database for reference
                         using var scope = _scopeFactory.CreateScope();
-                        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
 
                         // Get the latest setup for this device
                         var latestSetup = await dbContext.DeviceSetups
@@ -512,7 +512,7 @@ namespace IQLink.Services
 
                     using (var scope = _scopeFactory.CreateScope())
                     {
-                        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
 
                         // Start a transaction to ensure all operations succeed or fail together
                         using var transaction = await dbContext.Database.BeginTransactionAsync(stoppingToken);
@@ -715,7 +715,7 @@ namespace IQLink.Services
             {
                 // Create a new scope to resolve the dependencies
                 using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
                 var messageParser = scope.ServiceProvider.GetRequiredService<DeviceMessageParser>();
 
                 // Use the messageParser to determine message type
@@ -877,7 +877,7 @@ namespace IQLink.Services
         }
 
         /// Method to update the current device status with robust error handling
-        private async Task UpdateCurrentDeviceStatusAsync(ApplicationDbContext dbContext, DeviceStatus status)
+        private async Task UpdateCurrentDeviceStatusAsync(LipoDocDbContext dbContext, DeviceStatus status)
         {
             try
             {
@@ -969,7 +969,7 @@ namespace IQLink.Services
             }
         }
 
-        private async Task RegisterOrUpdateDeviceFromStatusAsync(ApplicationDbContext dbContext, DeviceStatus status, string currentIpAddress)
+        private async Task RegisterOrUpdateDeviceFromStatusAsync(LipoDocDbContext dbContext, DeviceStatus status, string currentIpAddress)
         {
             string deviceId = status.DeviceId;
             _logger.LogInformation($"Processing device registration for device ID: {deviceId} from IP: {currentIpAddress}");
@@ -1135,7 +1135,7 @@ namespace IQLink.Services
             }
         }
 
-        private async Task ProcessSetupResponseAsync(ApplicationDbContext dbContext, string message, string ipAddress, int port)
+        private async Task ProcessSetupResponseAsync(LipoDocDbContext dbContext, string message, string ipAddress, int port)
         {
             try
             {

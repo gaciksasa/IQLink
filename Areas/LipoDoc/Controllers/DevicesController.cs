@@ -12,11 +12,11 @@ namespace IQLink.Areas.LipoDoc.Controllers
     [Authorize]
     public class DevicesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly LipoDocDbContext _context;
         private readonly ILogger<DevicesController> _logger;
 
         public DevicesController(
-            ApplicationDbContext context,
+            LipoDocDbContext context,
             ILogger<DevicesController> logger)
         {
             _context = context;

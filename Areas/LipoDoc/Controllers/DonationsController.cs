@@ -14,13 +14,13 @@ namespace IQLink.Areas.LipoDoc.Controllers
     [Authorize]
     public class DonationsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly LipoDocDbContext _context;
         private readonly ILogger<DonationsController> _logger;
         private readonly DonationExportHelper _exportHelper;
         private readonly int _pageSize = 20; // Default page size
 
         public DonationsController(
-            ApplicationDbContext context,
+            LipoDocDbContext context,
             ILogger<DonationsController> logger,
             DonationExportHelper exportHelper)
         {

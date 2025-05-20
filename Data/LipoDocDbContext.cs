@@ -15,6 +15,7 @@ namespace IQLink.Data
         public DbSet<Device> Devices { get; set; }
         public DbSet<DeviceSetup> DeviceSetups { get; set; }
         public DbSet<ExportSettingsConfig> ExportSettingsConfigs { get; set; }
+        public DbSet<SystemNotification> SystemNotifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

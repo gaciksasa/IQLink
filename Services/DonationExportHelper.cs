@@ -12,11 +12,11 @@ namespace IQLink.Services
     public class DonationExportHelper
     {
         private readonly ILogger<DonationExportHelper> _logger;
-        private readonly ApplicationDbContext _dbContext;
+        private readonly LipoDocDbContext _dbContext;
 
         public DonationExportHelper(
             ILogger<DonationExportHelper> logger,
-            ApplicationDbContext dbContext)
+            LipoDocDbContext dbContext)
         {
             _logger = logger;
             _dbContext = dbContext;
