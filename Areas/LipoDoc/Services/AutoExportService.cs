@@ -68,7 +68,7 @@ namespace IQLink.Services
             try
             {
                 using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
                 var exportHelper = scope.ServiceProvider.GetRequiredService<DonationExportHelper>();
 
                 // Get all active auto-export configurations

@@ -64,7 +64,7 @@ namespace IQLink.Services
                 _logger.LogInformation("Starting device status cleanup job");
 
                 using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
 
                 // Calculate cutoff date
                 var cutoffDate = DateTime.Now.Subtract(_retentionPeriod);

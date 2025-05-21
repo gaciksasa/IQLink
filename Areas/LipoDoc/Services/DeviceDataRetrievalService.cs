@@ -38,7 +38,7 @@ namespace IQLink.Services
             try
             {
                 using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
 
                 // Get all active devices
                 var devices = await dbContext.Devices
@@ -91,7 +91,7 @@ namespace IQLink.Services
         private async Task<string> GetDeviceIPAddressAsync(string serialNumber)
         {
             using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
 
             // First try to get IP from latest status
             var latestStatus = await dbContext.DeviceStatuses
@@ -287,7 +287,7 @@ namespace IQLink.Services
             try
             {
                 using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
                 var messageParser = scope.ServiceProvider.GetRequiredService<DeviceMessageParser>();
 
                 // Try to get the export helper (it's optional, so we use GetService rather than GetRequiredService)

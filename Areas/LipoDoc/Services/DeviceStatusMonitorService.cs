@@ -63,7 +63,7 @@ namespace IQLink.Services
             {
                 // Create a new scope to resolve dependencies
                 using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
 
                 // Calculate the cutoff time for inactive devices
                 var cutoffTime = DateTime.Now.Subtract(_inactiveThreshold);

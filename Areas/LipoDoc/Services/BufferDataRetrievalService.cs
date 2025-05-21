@@ -177,7 +177,7 @@ namespace IQLink.Services
             try
             {
                 using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
 
                 var activeDevices = await dbContext.Devices
                     .Where(d => d.IsActive)
@@ -202,7 +202,7 @@ namespace IQLink.Services
         private async Task<string> GetDeviceIPAddressAsync(string serialNumber)
         {
             using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
 
             // First try from status records
             var latestStatus = await dbContext.DeviceStatuses
@@ -234,7 +234,7 @@ namespace IQLink.Services
             try
             {
                 using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
                 var messageParser = scope.ServiceProvider.GetRequiredService<DeviceMessageParser>();
 
                 var parsedMessage = messageParser.ParseMessage(message, ipAddress, port);
