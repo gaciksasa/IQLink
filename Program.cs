@@ -89,6 +89,7 @@ builder.Services.AddScoped<DeviceCommunicationService>();
 builder.Services.AddHostedService<AutoExportService>();
 builder.Services.AddScoped<DonationExportHelper>();
 builder.Services.AddSingleton<IViewContextAccessor, ViewContextAccessor>();
+builder.Services.AddScoped<DeviceDataRetrievalService>();
 
 builder.Services.AddMvc(options =>
 {

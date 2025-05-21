@@ -176,74 +176,100 @@ namespace IQLink.Services
                     // First process normal message
                     await ProcessDeviceMessageAsync(data, clientIP, clientPort);
 
-                    // Then send acknowledgment immediately within the same method
+                    // Then send acknowledgment and handle other operations
                     if (messageType == "Status" && !string.IsNullOrEmpty(connectedDeviceId))
                     {
                         try
                         {
+                            // Extract available data count from the message
+                            int availableData = 0;
+                            DeviceStatus parsedStatus = null;
+
+                            using (var scope = _scopeFactory.CreateScope())
+                            {
+                                var messageParser = scope.ServiceProvider.GetRequiredService<DeviceMessageParser>();
+                                parsedStatus = messageParser.ParseMessage(data, clientIP, clientPort) as DeviceStatus;
+                                if (parsedStatus != null)
+                                {
+                                    availableData = parsedStatus.AvailableData;
+                                }
+                            }
+
                             // Send acknowledgment directly using the current stream
                             await SendStatusAcknowledgmentDirect(stream, connectedDeviceId, stoppingToken);
+
+                            // Check if device has buffered data and request it
+                            if (availableData > 0)
+                            {
+                                _logger.LogInformation($"Device {connectedDeviceId} reports {availableData} available data records. Requesting data...");
+
+                                // Add a small delay before sending the data request
+                                await Task.Delay(500, stoppingToken);
+
+                                // Send data request directly to the device
+                                await SendDataRequestDirect(stream, connectedDeviceId, stoppingToken);
+                            }
+
+                            // Handle pending serial changes and time syncing here
+                            if (_pendingSerialChanges.TryRemove(connectedDeviceId, out string newSerialNumber))
+                            {
+                                _logger.LogInformation($"Found pending serial number change for device {connectedDeviceId} -> {newSerialNumber}");
+                                try
+                                {
+                                    // Send serial number change command using the current stream
+                                    await SendSerialUpdateCommandDirect(stream, connectedDeviceId, newSerialNumber, stoppingToken);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, $"Error sending serial update command to {connectedDeviceId}: {ex.Message}");
+                                }
+                            }
+
+                            if (_pendingTimeSync.TryRemove(connectedDeviceId, out string dateTimeFormat))
+                            {
+                                _logger.LogInformation($"Found pending time sync for device {connectedDeviceId} -> {dateTimeFormat}");
+                                try
+                                {
+                                    // Send time sync command using the current stream
+                                    await SendTimeSyncCommandDirect(stream, connectedDeviceId, dateTimeFormat, stoppingToken);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, $"Error sending time sync command to {connectedDeviceId}: {ex.Message}");
+                                }
+                            }
+
+                            if (_pendingSetupUpdates.TryRemove(connectedDeviceId, out DeviceSetup setupToUpdate))
+                            {
+                                _logger.LogInformation($"Found pending setup update for device {connectedDeviceId}");
+                                try
+                                {
+                                    // Send setup update command using the current stream
+                                    await SendSetupUpdateCommandDirect(stream, setupToUpdate, stoppingToken);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, $"Error sending setup update command to {connectedDeviceId}: {ex.Message}");
+                                }
+                            }
+
+                            if (_pendingSetupRequests.TryRemove(connectedDeviceId, out _))
+                            {
+                                _logger.LogInformation($"Found pending setup request for device {connectedDeviceId}");
+                                try
+                                {
+                                    // Send setup request command using the current stream
+                                    await SendSetupRequestDirect(stream, connectedDeviceId, stoppingToken);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, $"Error sending setup request to {connectedDeviceId}: {ex.Message}");
+                                }
+                            }
                         }
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, $"Error sending status acknowledgment to {connectedDeviceId}");
-                        }
-
-                        // Handle pending serial changes and time syncing here
-                        if (_pendingSerialChanges.TryRemove(connectedDeviceId, out string newSerialNumber))
-                        {
-                            _logger.LogInformation($"Found pending serial number change for device {connectedDeviceId} -> {newSerialNumber}");
-                            try
-                            {
-                                // Send serial number change command using the current stream
-                                await SendSerialUpdateCommandDirect(stream, connectedDeviceId, newSerialNumber, stoppingToken);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError(ex, $"Error sending serial update command to {connectedDeviceId}: {ex.Message}");
-                            }
-                        }
-
-                        if (_pendingTimeSync.TryRemove(connectedDeviceId, out string dateTimeFormat))
-                        {
-                            _logger.LogInformation($"Found pending time sync for device {connectedDeviceId} -> {dateTimeFormat}");
-                            try
-                            {
-                                // Send time sync command using the current stream
-                                await SendTimeSyncCommandDirect(stream, connectedDeviceId, dateTimeFormat, stoppingToken);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError(ex, $"Error sending time sync command to {connectedDeviceId}: {ex.Message}");
-                            }
-                        }
-
-                        if (_pendingSetupUpdates.TryRemove(connectedDeviceId, out DeviceSetup setupToUpdate))
-                        {
-                            _logger.LogInformation($"Found pending setup update for device {connectedDeviceId}");
-                            try
-                            {
-                                // Send setup update command using the current stream
-                                await SendSetupUpdateCommandDirect(stream, setupToUpdate, stoppingToken);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError(ex, $"Error sending setup update command to {connectedDeviceId}: {ex.Message}");
-                            }
-                        }
-
-                        if (_pendingSetupRequests.TryRemove(connectedDeviceId, out _))
-                        {
-                            _logger.LogInformation($"Found pending setup request for device {connectedDeviceId}");
-                            try
-                            {
-                                // Send setup request command using the current stream
-                                await SendSetupRequestDirect(stream, connectedDeviceId, stoppingToken);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError(ex, $"Error sending setup request to {connectedDeviceId}: {ex.Message}");
-                            }
                         }
                     }
                     else if (messageType == "SerialUpdateResponse")
@@ -347,6 +373,44 @@ namespace IQLink.Services
                 }
 
                 _logger.LogInformation($"Client disconnected: {clientIP}:{clientPort}");
+            }
+        }
+
+        private async Task SendDataRequestDirect(NetworkStream stream, string deviceId, CancellationToken stoppingToken)
+        {
+            try
+            {
+                // Format: #uªdeviceIdª<LF>
+                using (var ms = new MemoryStream())
+                {
+                    // "#u" prefix
+                    ms.WriteByte(0x23); // #
+                    ms.WriteByte(0x75); // u
+
+                    // Separator (0xAA)
+                    ms.WriteByte(0xAA);
+
+                    // Device ID bytes
+                    byte[] deviceIdBytes = Encoding.ASCII.GetBytes(deviceId);
+                    ms.Write(deviceIdBytes, 0, deviceIdBytes.Length);
+
+                    // Separator (0xAA)
+                    ms.WriteByte(0xAA);
+
+                    // Line feed (0x0A)
+                    ms.WriteByte(0x0A);
+
+                    byte[] requestData = ms.ToArray();
+
+                    // Send the data request
+                    await stream.WriteAsync(requestData, 0, requestData.Length, stoppingToken);
+                    _logger.LogInformation($"Sent data request (#u) to device {deviceId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error sending data request to device {deviceId}");
+                throw;
             }
         }
 

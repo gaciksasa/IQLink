@@ -30,6 +30,16 @@ CREATE TABLE `__efmigrationshistory` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `__efmigrationshistory`
+--
+
+LOCK TABLES `__efmigrationshistory` WRITE;
+/*!40000 ALTER TABLE `__efmigrationshistory` DISABLE KEYS */;
+INSERT INTO `__efmigrationshistory` VALUES ('20250225074347_InitialCreate','8.0.13'),('20250429000000_AddFilterOptionsToExportSettings','6.0.0');
+/*!40000 ALTER TABLE `__efmigrationshistory` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `deviceconfigurations`
 --
 
@@ -68,6 +78,15 @@ CREATE TABLE `deviceconfigurations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `deviceconfigurations`
+--
+
+LOCK TABLES `deviceconfigurations` WRITE;
+/*!40000 ALTER TABLE `deviceconfigurations` DISABLE KEYS */;
+/*!40000 ALTER TABLE `deviceconfigurations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `exportsettings`
 --
 
@@ -96,38 +115,13 @@ CREATE TABLE `exportsettings` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `exportsettingsconfigs`
+-- Dumping data for table `exportsettings`
 --
 
-DROP TABLE IF EXISTS `exportsettingsconfigs`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `exportsettingsconfigs` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Name` varchar(50) NOT NULL,
-  `Description` text,
-  `IsDefault` tinyint(1) NOT NULL DEFAULT '0',
-  `CreatedAt` datetime NOT NULL,
-  `LastUsedAt` datetime DEFAULT NULL,
-  `SelectedColumnsJson` text,
-  `ColumnOrderJson` text,
-  `EmptyColumnsCount` int NOT NULL DEFAULT '0',
-  `Delimiter` varchar(10) DEFAULT ',',
-  `CustomSeparator` varchar(10) DEFAULT NULL,
-  `DateFormat` varchar(20) DEFAULT 'dd.MM.yyyy',
-  `TimeFormat` varchar(20) DEFAULT 'HH:mm:ss',
-  `IncludeHeaders` tinyint(1) NOT NULL DEFAULT '1',
-  `CreatedBy` varchar(100) DEFAULT NULL,
-  `StartDate` datetime DEFAULT NULL,
-  `EndDate` datetime DEFAULT NULL,
-  `DeviceId` varchar(100) DEFAULT NULL,
-  `ExportFolderPath` varchar(255) DEFAULT NULL,
-  `AutoExportEnabled` tinyint(1) NOT NULL DEFAULT '0',
-  `AutoExportMode` varchar(50) DEFAULT 'single_file',
-  `CustomFileName` varchar(255) DEFAULT 'Donations_Export',
-  PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+LOCK TABLES `exportsettings` WRITE;
+/*!40000 ALTER TABLE `exportsettings` DISABLE KEYS */;
+/*!40000 ALTER TABLE `exportsettings` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `users`
@@ -148,6 +142,16 @@ CREATE TABLE `users` (
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'admin','$2a$11$IHQ.gARYa/pPBV/u5MYnAenuKmUVi3dmQg4jXDgquOcd/EXhYeeGW','Admin','Saša','admin@lmbsoft.rs','2025-02-27 12:24:20.361087','2025-05-21 07:49:20.302190'),(2,'user','$2a$11$Y3P72amPUa2Zns6brwvKjOSGLYoDgfgVcbqqAQEW1WMXEbnzIv9G6','User','Regular User','user@lmbsoft.rs','2025-02-27 12:24:20.592338','2025-04-23 12:52:20.860103');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -158,4 +162,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-20 14:44:08
+-- Dump completed on 2025-05-21  9:26:44

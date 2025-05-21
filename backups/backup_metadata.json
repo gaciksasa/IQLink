@@ -21,10 +21,10 @@
     "CreatedAt": "2025-03-13T09:19:53.906314+01:00"
   },
   {
-    "FileName": "devicedata_20250423_084935.sql.gz",
-    "Description": "another backup",
+    "FileName": "devicedata_20250521_082400.sql.gz",
+    "Description": "Scheduled automatic backup",
     "Database": "devicedata",
-    "FileSize": 9163,
-    "CreatedAt": "2025-04-23T08:49:35.6160533+02:00"
+    "FileSize": 1276,
+    "CreatedAt": "2025-05-21T08:24:00.5787797+02:00"
   }
 ]
