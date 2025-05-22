@@ -435,10 +435,14 @@ namespace IQLink.Services
                     // Separator (0xAA)
                     ms.WriteByte(0xAA);
 
-                    // Calculate the checksum
-                    byte[] dataBytesSoFar = ms.ToArray();
-                    byte checksum = CalculateChecksum(dataBytesSoFar);
-                    ms.WriteByte(checksum);
+                    // Calculate the checksum using the same method as setup commands
+                    byte[] messageBytes = ms.ToArray();
+                    ushort checksumValue = CalculateChecksumUInt16(messageBytes);
+                    string hexString = (checksumValue % 253).ToString("X2");
+
+                    // Write checksum as two ASCII hex digits
+                    ms.WriteByte((byte)hexString[0]); // First hex digit as ASCII
+                    ms.WriteByte((byte)hexString[1]); // Second hex digit as ASCII
 
                     // String end (0xFD)
                     ms.WriteByte(0xFD);
