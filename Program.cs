@@ -4,6 +4,7 @@ using IQLink.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using IQLink.Filters;
+using IQLink.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,13 +64,22 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddSingleton<DbContextFactory>();
 builder.Services.AddSingleton<DeviceModuleRegistry>();
 
-// Register existing services
+// Register TCP Server and related services
 builder.Services.AddSingleton<TCPServerService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<TCPServerService>());
+
+// Register monitoring services
 builder.Services.AddSingleton<DeviceStatusMonitorService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<DeviceStatusMonitorService>());
 builder.Services.AddSingleton<DeviceStatusCleanupService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<DeviceStatusCleanupService>());
+
+// Register auto-export services (FIXED)
+builder.Services.AddScoped<DonationExportHelper>();
+builder.Services.AddSingleton<AutoExportService>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<AutoExportService>());
+
+// Register core application services
 builder.Services.AddScoped<DatabaseStatusService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<DeviceMessageParser>();
@@ -77,6 +87,8 @@ builder.Services.AddScoped<BCrypt.Net.BCrypt>();
 builder.Services.AddSingleton<IViewContextAccessor, ViewContextAccessor>();
 builder.Services.AddScoped<NetworkUtilityService>();
 builder.Services.AddScoped<DatabaseConfigService>();
+
+// Register backup services
 builder.Services.AddScoped<DatabaseBackupService>(provider =>
     new DatabaseBackupService(
         provider.GetRequiredService<ILogger<DatabaseBackupService>>(),
@@ -84,13 +96,13 @@ builder.Services.AddScoped<DatabaseBackupService>(provider =>
         provider.GetRequiredService<IWebHostEnvironment>()));
 builder.Services.AddSingleton<ScheduledBackupService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<ScheduledBackupService>());
+
+// Register utility services
 builder.Services.AddSingleton<ApplicationLifetimeService>();
 builder.Services.AddScoped<DeviceCommunicationService>();
-builder.Services.AddHostedService<AutoExportService>();
-builder.Services.AddScoped<DonationExportHelper>();
-builder.Services.AddSingleton<IViewContextAccessor, ViewContextAccessor>();
 builder.Services.AddScoped<DeviceDataRetrievalService>();
 
+// Add MVC with filters
 builder.Services.AddMvc(options =>
 {
     options.Filters.Add<ViewContextFilter>();
@@ -186,6 +198,10 @@ try
             logger.LogError(ex, "Error applying migrations to legacy database.");
         }
 
+        // Initialize auto-export configurations if needed
+        logger.LogInformation("Checking auto-export configurations...");
+        await InitializeAutoExportConfigurations(scope, logger);
+
         logger.LogInformation("Database initialization completed");
     }
 }
@@ -267,5 +283,81 @@ async Task InitializeDatabase<TContext>(IServiceScope scope, ILogger logger, str
     catch (Exception ex)
     {
         logger.LogError(ex, $"Error initializing {dbName} database.");
+    }
+}
+
+// Helper method to initialize auto-export configurations
+async Task InitializeAutoExportConfigurations(IServiceScope scope, ILogger logger)
+{
+    try
+    {
+        var lipoDocContext = scope.ServiceProvider.GetRequiredService<LipoDocDbContext>();
+
+        // Check if ExportSettingsConfigs table exists
+        bool tableExists = true;
+        try
+        {
+            await lipoDocContext.Database.ExecuteSqlRawAsync("SELECT 1 FROM ExportSettingsConfigs LIMIT 1");
+        }
+        catch
+        {
+            tableExists = false;
+            logger.LogWarning("ExportSettingsConfigs table doesn't exist yet. Auto-export will be unavailable until migrations are applied.");
+        }
+
+        if (tableExists)
+        {
+            // Check if there's at least one default auto-export configuration
+            var hasDefaultConfig = await lipoDocContext.ExportSettingsConfigs
+                .AnyAsync(c => c.IsDefault);
+
+            if (!hasDefaultConfig)
+            {
+                logger.LogInformation("Creating default auto-export configuration...");
+
+                var defaultConfig = new ExportSettingsConfig
+                {
+                    Name = "Default Auto Export",
+                    Description = "Default configuration for automatic donation exports",
+                    IsDefault = true,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = "System",
+                    AutoExportEnabled = false, // Start disabled by default
+                    AutoExportMode = "single_file",
+                    CustomFileName = "Donations_Export",
+                    ExportFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "LipoDocExports"),
+                    Delimiter = ",",
+                    DateFormat = "yyyy-MM-dd",
+                    TimeFormat = "HH:mm:ss",
+                    IncludeHeaders = true,
+                    SelectedColumnsJson = System.Text.Json.JsonSerializer.Serialize(new List<string>
+                    {
+                        "DonationIdBarcode", "DeviceId", "Timestamp", "LipemicValue",
+                        "LipemicGroup", "LipemicStatus", "OperatorIdBarcode"
+                    }),
+                    ColumnOrderJson = System.Text.Json.JsonSerializer.Serialize(new List<string>
+                    {
+                        "DonationIdBarcode", "DeviceId", "Timestamp", "LipemicValue",
+                        "LipemicGroup", "LipemicStatus", "OperatorIdBarcode"
+                    }),
+                    EmptyColumnsCount = 0
+                };
+
+                lipoDocContext.ExportSettingsConfigs.Add(defaultConfig);
+                await lipoDocContext.SaveChangesAsync();
+
+                logger.LogInformation("Default auto-export configuration created successfully. " +
+                    "Auto-export is disabled by default - enable it through the Export page.");
+            }
+            else
+            {
+                logger.LogInformation("Auto-export configurations already exist.");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        // Don't fail startup if auto-export setup fails
+        logger.LogError(ex, "Error initializing auto-export configurations. Auto-export may not work properly.");
     }
 }

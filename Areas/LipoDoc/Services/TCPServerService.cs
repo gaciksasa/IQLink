@@ -823,10 +823,38 @@ namespace IQLink.Services
                     }
                     else if (parsedMessage is DonationsData data)
                     {
-                        // Store donation data
-                        dbContext.DonationsData.Add(data);
-                        await dbContext.SaveChangesAsync();
-                        _logger.LogInformation($"Donation data from {data.DeviceId} stored in database");
+                        try
+                        {
+                            // Store donation data
+                            dbContext.DonationsData.Add(data);
+                            await dbContext.SaveChangesAsync();
+                            _logger.LogInformation($"Donation data from {data.DeviceId} stored in database with ID: {data.Id}");
+
+                            // Try to trigger auto-export (optional service, so use GetService instead of GetRequiredService)
+                            var exportHelper = scope.ServiceProvider.GetService<DonationExportHelper>();
+                            if (exportHelper != null)
+                            {
+                                try
+                                {
+                                    // This will check for enabled auto-export configurations and export if needed
+                                    await exportHelper.ExportDonationAsync(data);
+                                }
+                                catch (Exception exportEx)
+                                {
+                                    _logger.LogError(exportEx, $"Error auto-exporting donation {data.Id}: {exportEx.Message}");
+                                    // Don't throw - continue processing even if export fails
+                                }
+                            }
+                            else
+                            {
+                                _logger.LogDebug("DonationExportHelper service not available for auto-export");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Error storing donation data: {ex.Message}");
+                            throw; // Re-throw database errors
+                        }
                     }
                     else if (parsedMessage is DeviceMessageParser.SetupResponse setupResponse)
                     {
